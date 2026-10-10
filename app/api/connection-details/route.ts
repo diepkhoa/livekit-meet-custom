@@ -1,89 +1,93 @@
-import { randomString } from '@/lib/client-utils';
-import { getLiveKitURL } from '@/lib/getLiveKitURL';
-import { ConnectionDetails } from '@/lib/types';
-import { AccessToken, AccessTokenOptions, VideoGrant } from 'livekit-server-sdk';
+import { AccessToken, RoomServiceClient } from 'livekit-server-sdk';
 import { NextRequest, NextResponse } from 'next/server';
-
-const API_KEY = process.env.LIVEKIT_API_KEY;
-const API_SECRET = process.env.LIVEKIT_API_SECRET;
-const LIVEKIT_URL = process.env.LIVEKIT_URL;
-
-const COOKIE_KEY = 'random-participant-postfix';
 
 export async function GET(request: NextRequest) {
   try {
-    // Parse query parameters
-    const roomName = request.nextUrl.searchParams.get('roomName');
-    const participantName = request.nextUrl.searchParams.get('participantName');
-    const metadata = request.nextUrl.searchParams.get('metadata') ?? '';
-    const region = request.nextUrl.searchParams.get('region');
-    if (!LIVEKIT_URL) {
-      throw new Error('LIVEKIT_URL is not defined');
-    }
-    const livekitServerUrl = region ? getLiveKitURL(LIVEKIT_URL, region) : LIVEKIT_URL;
-    let randomParticipantPostfix = request.cookies.get(COOKIE_KEY)?.value;
-    if (livekitServerUrl === undefined) {
-      throw new Error('Invalid region');
+    const searchParams = request.nextUrl.searchParams;
+    const roomName = searchParams.get('roomName');
+    const participantName = searchParams.get('participantName');
+
+    if (!roomName || !participantName) {
+      return NextResponse.json({ error: 'Thiếu mã phòng hoặc tên người tham gia' }, { status: 400 });
     }
 
-    if (typeof roomName !== 'string') {
-      return new NextResponse('Missing required query parameter: roomName', { status: 400 });
-    }
-    if (participantName === null) {
-      return new NextResponse('Missing required query parameter: participantName', { status: 400 });
+    const apiKey = process.env.LIVEKIT_API_KEY;
+    const apiSecret = process.env.LIVEKIT_API_SECRET;
+    const livekitUrl = process.env.LIVEKIT_URL;
+
+    if (!apiKey || !apiSecret || !livekitUrl) {
+      return NextResponse.json({ error: 'Cấu hình LiveKit trên server chưa đầy đủ' }, { status: 500 });
     }
 
-    // Generate participant token
-    if (!randomParticipantPostfix) {
-      randomParticipantPostfix = randomString(4);
+    // 1. KIỂM TRA XEM NGƯỜI YÊU CẦU CÓ PHẢI LÀ GIÁO VIÊN ĐÃ ĐĂNG NHẬP GOOGLE KHÔNG
+    const teacherCookie = request.cookies.get('teacher_session');
+    let isTeacher = false;
+    let finalParticipantName = participantName;
+
+    if (teacherCookie) {
+      try {
+        const session = JSON.parse(teacherCookie.value);
+        const allowedTeachers = (process.env.ALLOWED_TEACHERS || '')
+          .split(',')
+          .map((e) => e.trim().toLowerCase());
+
+        if (session.email && allowedTeachers.includes(session.email.toLowerCase())) {
+          isTeacher = true;
+          finalParticipantName = session.name; // Luôn dùng tên Google đã xác thực
+        }
+      } catch (e) {
+        // Cookie không hợp lệ
+      }
     }
-    const participantToken = await createParticipantToken(
-      {
-        identity: `${participantName}__${randomParticipantPostfix}`,
-        name: participantName,
-        metadata,
-      },
+
+    // 2. NẾU LÀ HỌC SINH (CHƯA ĐĂNG NHẬP): BẮT BUỘC KIỂM TRA PHÒNG ĐÃ TỒN TẠI CHƯA
+    if (!isTeacher) {
+      // Chuyển wss:// thành https:// để gọi API quản trị của LiveKit
+      const httpUrl = livekitUrl.replace('wss://', 'https://').replace('ws://', 'http://');
+      const roomService = new RoomServiceClient(httpUrl, apiKey, apiSecret);
+
+      try {
+        const rooms = await roomService.listRooms([roomName]);
+        const roomExists = rooms.some((r) => r.name === roomName);
+
+        // NẾU PHÒNG CHƯA ĐƯỢC TẠO BỞI GIÁO VIÊN -> CHẶN NGAY LẬP TỨC!
+        if (!roomExists) {
+          return NextResponse.json(
+            { error: 'Phòng học này không tồn tại hoặc chưa được giáo viên mở!' },
+            { status: 404 }
+          );
+        }
+      } catch (err) {
+        console.error('Lỗi khi kiểm tra phòng học:', err);
+        return NextResponse.json({ error: 'Không thể kiểm tra trạng thái phòng học' }, { status: 500 });
+      }
+    }
+
+    // 3. CẤP VÉ TOKEN (Học sinh chỉ có quyền nghe/nói/xem, Giáo viên có quyền Host)
+    const at = new AccessToken(apiKey, apiSecret, {
+      identity: finalParticipantName,
+      name: finalParticipantName,
+    });
+
+    at.addGrant({
+      roomJoin: true,
+      room: roomName,
+      canPublish: true,
+      canSubscribe: true,
+      canPublishData: true,
+      roomAdmin: isTeacher, // Chỉ giáo viên mới có quyền Admin của phòng
+    });
+
+    const token = await at.toJwt();
+
+    return NextResponse.json({
+      serverUrl: livekitUrl,
       roomName,
-    );
-
-    // Return connection details
-    const data: ConnectionDetails = {
-      serverUrl: livekitServerUrl,
-      roomName: roomName,
-      participantToken: participantToken,
-      participantName: participantName,
-    };
-    return new NextResponse(JSON.stringify(data), {
-      headers: {
-        'Content-Type': 'application/json',
-        'Set-Cookie': `${COOKIE_KEY}=${randomParticipantPostfix}; Path=/; HttpOnly; SameSite=Strict; Secure; Expires=${getCookieExpirationTime()}`,
-      },
+      participantToken: token,
+      participantName: finalParticipantName,
     });
   } catch (error) {
-    if (error instanceof Error) {
-      return new NextResponse(error.message, { status: 500 });
-    }
+    console.error('Lỗi sinh token:', error);
+    return NextResponse.json({ error: 'Lỗi máy chủ nội bộ' }, { status: 500 });
   }
-}
-
-function createParticipantToken(userInfo: AccessTokenOptions, roomName: string) {
-  const at = new AccessToken(API_KEY, API_SECRET, userInfo);
-  at.ttl = '5m';
-  const grant: VideoGrant = {
-    room: roomName,
-    roomJoin: true,
-    canPublish: true,
-    canPublishData: true,
-    canSubscribe: true,
-  };
-  at.addGrant(grant);
-  return at.toJwt();
-}
-
-function getCookieExpirationTime(): string {
-  var now = new Date();
-  var time = now.getTime();
-  var expireTime = time + 60 * 120 * 1000;
-  now.setTime(expireTime);
-  return now.toUTCString();
 }

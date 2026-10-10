@@ -2,16 +2,24 @@
   position: relative;
   display: flex;
   align-content: space-between;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .tabs > .tab {
-  padding: 0.5rem;
+  padding: 0.625rem 1rem;
   border-radius: 0;
-  padding-bottom: 0.5rem;
-  border-bottom: 3px solid;
-  border-color: var(--bg5);
+  border-bottom: 2px solid transparent;
+  color: #94a3b8;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.tabs > .tab:hover {
+  color: #ffffff;
 }
 
 .tabs > .tab[aria-pressed='true'] {
-  border-color: var(--lk-accent-bg);
+  border-color: #6366f1;
+  color: #ffffff;
 }
+

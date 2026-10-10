@@ -8,19 +8,22 @@ export default async function Page({
 }: {
   params: Promise<{ roomName: string }>;
   searchParams: Promise<{
-    // FIXME: We should not allow values for regions if in playground mode.
     region?: string;
     hq?: string;
     codec?: string;
     singlePC?: string;
+    name?: string;
   }>;
 }) {
   const _params = await params;
   const _searchParams = await searchParams;
+
+  // 1. ĐỔI MẶC ĐỊNH SANG H264 (Dòng 24 trong ảnh của bạn)
   const codec =
     typeof _searchParams.codec === 'string' && isVideoCodec(_searchParams.codec)
       ? _searchParams.codec
-      : 'vp9';
+      : 'h264'; // <--- Đổi 'vp9' thành 'h264'
+
   const hq = _searchParams.hq === 'true' ? true : false;
   const singlePC = _searchParams.singlePC !== 'false';
 
@@ -31,6 +34,9 @@ export default async function Page({
       hq={hq}
       codec={codec}
       singlePeerConnection={singlePC}
+      // 2. TRUYỀN TÊN TỪ TRANG CHỦ XUỐNG ĐỂ KHÔNG BỊ HỎI LẠI
+      initialName={typeof _searchParams.name === 'string' ? _searchParams.name : undefined}
     />
   );
 }
+

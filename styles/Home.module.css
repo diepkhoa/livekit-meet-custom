@@ -1,40 +1,215 @@
+/* Layout tổng thể 
 .main {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #090d16;
   position: relative;
-  display: grid;
-  gap: 1rem;
-  justify-content: center;
-  place-content: center;
-  justify-items: center;
-  overflow: auto;
-  flex-grow: 1;
-}
+  overflow: hidden;
+  font-family: 'Nunito', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  color: #f8fafc;
+  padding: 24px;
+}*/
 
-.tabContainer {
-  width: 100%;
-  max-width: 500px;
-  padding-inline: 2rem;
-}
-
-.tabSelect {
+.main {
+  min-height: 100vh;
   display: flex;
-  justify-content: stretch;
-  gap: 0.125rem;
-  padding: 0.125rem;
-  margin: 0 auto 1.5rem;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 0.5rem;
-}
-
-.tabSelect > * {
-  width: 100%;
-}
-
-.tabContent {
-  display: flex;
+  align-items: center;
   justify-content: center;
+  position: relative;
+  overflow: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  color: #f8fafc;
+  padding: 24px;
+
+  /* ── ẢNH NỀN KÈM LỚP PHỦ MỜ (OVERLAY) ĐỂ CHỮ KHÔNG BỊ CHÓI ── */
+  background:
+    linear-gradient(rgba(9, 13, 22, 0.75), rgba(9, 13, 22, 0.85)),
+    /* Lớp phủ làm dịu ảnh */
+    url('/background-images/ali-kazal-tbw_KQE3Cbg-unsplash.jpg');
+  /* Đường dẫn ảnh trong thư mục public */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* Hiệu ứng ánh sáng nền mềm mại (Ambient Glow) 
+.ambientGlow {
+  position: absolute;
+  top: 30%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 500px;
+  height: 350px;
+  background: radial-gradient(circle, rgba(99, 102, 241, 0.18) 0%, rgba(168, 85, 247, 0.08) 50%, transparent 70%);
+  filter: blur(80px);
+  pointer-events: none;
+  z-index: 0;
+}*/
+
+.container {
+  width: 100%;
+  max-width: 440px;
+  position: relative;
+  z-index: 1;
+  display: flex;
   flex-direction: column;
-  gap: 0.75rem;
-  padding: 1.5rem;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 0.5rem;
+  gap: 28px;
+}
+
+/* Header */
+.header {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Huy hiệu trạng thái nhỏ sang trọng */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(30, 41, 59, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 6px 14px;
+  border-radius: 9999px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #cbd5e1;
+  backdrop-filter: blur(8px);
+}
+
+.badgeDot {
+  width: 7px;
+  height: 7px;
+  background-color: #10b981;
+  /* Màu xanh lá online */
+  border-radius: 50%;
+  box-shadow: 0 0 8px #10b981;
+}
+
+.title {
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: #ffffff;
+  margin: 0;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+.subtitle {
+  font-size: 14px;
+  color: #94a3b8;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Thẻ kính mờ (Card Glassmorphism) */
+.card {
+  background: rgba(15, 23, 42, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  padding: 32px 28px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #cbd5e1;
+}
+
+.input {
+  width: 100%;
+  background: rgba(30, 41, 59, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 12px 16px;
+  font-size: 14px;
+  color: #ffffff;
+  outline: none;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.input:focus {
+  border-color: #6366f1;
+  background: rgba(30, 41, 59, 0.9);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
+}
+
+.input::placeholder {
+  color: #64748b;
+}
+
+/* Nút bấm Hiện đại */
+.button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  padding: 13px 20px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35);
+  margin-top: 6px;
+}
+
+.button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(99, 102, 241, 0.5);
+  background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+}
+
+.button:active {
+  transform: translateY(0);
+}
+
+.buttonIcon {
+  width: 18px;
+  height: 18px;
+  transition: transform 0.2s ease;
+}
+
+.button:hover .buttonIcon {
+  transform: translateX(3px);
+}
+
+/* Footer */
+.footer {
+  text-align: center;
+  font-size: 12px;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.divider {
+  color: #475569;
 }

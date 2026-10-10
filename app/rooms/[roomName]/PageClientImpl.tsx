@@ -23,6 +23,7 @@ import {
   DeviceUnsupportedError,
   RoomConnectOptions,
   RoomEvent,
+  Track,
   TrackPublishDefaults,
   VideoCaptureOptions,
 } from 'livekit-client';
@@ -40,17 +41,18 @@ export function PageClientImpl(props: {
   hq: boolean;
   codec: VideoCodec;
   singlePeerConnection: boolean;
+  initialName?: string;
 }) {
   const [preJoinChoices, setPreJoinChoices] = React.useState<LocalUserChoices | undefined>(
     undefined,
   );
   const preJoinDefaults = React.useMemo(() => {
     return {
-      username: '',
+      username: props.initialName && props.initialName.trim() !== '' ? props.initialName : '',
       videoEnabled: true,
       audioEnabled: true,
     };
-  }, []);
+  }, [props.initialName]);
   const [connectionDetails, setConnectionDetails] = React.useState<ConnectionDetails | undefined>(
     undefined,
   );
@@ -63,20 +65,34 @@ export function PageClientImpl(props: {
     if (props.region) {
       url.searchParams.append('region', props.region);
     }
+
     const connectionDetailsResp = await fetch(url.toString());
+
+    if (!connectionDetailsResp.ok) {
+      const errData = await connectionDetailsResp.json().catch(() => ({}));
+      alert(errData.error || 'Phòng học này không tồn tại hoặc chưa được giáo viên cấp quyền truy cập!');
+      window.location.href = '/';
+      return;
+    }
+
     const connectionDetailsData = await connectionDetailsResp.json();
     setConnectionDetails(connectionDetailsData);
-  }, []);
+  }, [props.roomName, props.region]);
+
   const handlePreJoinError = React.useCallback((e: any) => console.error(e), []);
 
   return (
-    <main data-lk-theme="default" style={{ height: '100%' }}>
+    <main data-lk-theme="default" className="lk-main-room">
       {connectionDetails === undefined || preJoinChoices === undefined ? (
-        <div style={{ display: 'grid', placeItems: 'center', height: '100%' }}>
+        <div className="lk-prejoin-wrapper">
           <PreJoin
             defaults={preJoinDefaults}
             onSubmit={handlePreJoinSubmit}
             onError={handlePreJoinError}
+            joinLabel="Bắt đầu lớp học"
+            micLabel="Micro"
+            camLabel="Camera"
+            userLabel="Tên hiển thị"
           />
         </div>
       ) : (
@@ -110,36 +126,57 @@ function VideoConferenceComponent(props: {
   const [e2eeSetupComplete, setE2eeSetupComplete] = React.useState(false);
 
   const roomOptions = React.useMemo((): RoomOptions => {
-    let videoCodec: VideoCodec | undefined = props.options.codec ? props.options.codec : 'vp9';
-    if (e2eeEnabled && (videoCodec === 'av1' || videoCodec === 'vp9')) {
-      videoCodec = undefined;
-    }
+    // Ép codec về 'h264' (hoặc 'vp8') để loại bỏ 100% lỗi VP9 SVC
+    const selectedCodec: VideoCodec = 'h264';
+
     const videoCaptureDefaults: VideoCaptureOptions = {
       deviceId: props.userChoices.videoDeviceId ?? undefined,
       resolution: props.options.hq ? VideoPresets.h2160 : VideoPresets.h720,
     };
+
     const publishDefaults: TrackPublishDefaults = {
       dtx: false,
       videoSimulcastLayers: props.options.hq
         ? [VideoPresets.h1080, VideoPresets.h720]
         : [VideoPresets.h540, VideoPresets.h216],
       red: !e2eeEnabled,
-      videoCodec,
+      videoCodec: selectedCodec,
+
+      // ✅ CÁCH TẮT SIMULCAST CHO SCREEN SHARE ĐÚNG CHUẨN TYPESCRIPT:
+      // Truyền mảng rỗng [] để LiveKit KHÔNG tạo bất kỳ layer phụ (LOW/MEDIUM) nào!
+      screenShareSimulcastLayers: [],
+
+      screenShareEncoding: {
+        maxBitrate: 8_000_000, // 3.5 Mbps cực kỳ sắc nét cho bài giảng
+        maxFramerate: 20,      // 20 fps tối ưu cho viết bảng iPad
+      },
     };
+
     return {
-      videoCaptureDefaults: videoCaptureDefaults,
-      publishDefaults: publishDefaults,
+      videoCaptureDefaults,
+      publishDefaults,
       audioCaptureDefaults: {
         deviceId: props.userChoices.audioDeviceId ?? undefined,
       },
-      adaptiveStream: true,
-      dynacast: true,
+      adaptiveStream: false,
+      dynacast: false,
       e2ee: keyProvider && worker && e2eeEnabled ? { keyProvider, worker } : undefined,
       singlePeerConnection: props.options.singlePeerConnection,
     };
-  }, [props.userChoices, props.options.hq, props.options.codec]);
+  }, [props.userChoices, props.options.hq, e2eeEnabled]);
 
-  const room = React.useMemo(() => new Room(roomOptions), []);
+  const room = React.useMemo(() => new Room(roomOptions), [roomOptions]);
+
+  const router = useRouter();
+  const handleOnLeave = React.useCallback(() => router.push('/'), [router]);
+  const handleError = React.useCallback((error: Error) => {
+    console.error(error);
+    alert(`Lỗi không mong đợi: ${error.message}`);
+  }, []);
+  const handleEncryptionError = React.useCallback((error: Error) => {
+    console.error(error);
+    alert(`Lỗi mã hoá: ${error.message}`);
+  }, []);
 
   React.useEffect(() => {
     if (e2eeEnabled) {
@@ -148,9 +185,7 @@ function VideoConferenceComponent(props: {
         .then(() => {
           room.setE2EEEnabled(true).catch((e) => {
             if (e instanceof DeviceUnsupportedError) {
-              alert(
-                `You're trying to join an encrypted meeting, but your browser does not support it. Please update it to the latest version and try again.`,
-              );
+              alert(`Trình duyệt không hỗ trợ mã hoá đầu cuối.`);
               console.error(e);
             } else {
               throw e;
@@ -202,29 +237,73 @@ function VideoConferenceComponent(props: {
     };
   }, [e2eeSetupComplete, room, props.connectionDetails, props.userChoices]);
 
-  const lowPowerMode = useLowCPUOptimizer(room);
-
-  const router = useRouter();
-  const handleOnLeave = React.useCallback(() => router.push('/'), [router]);
-  const handleError = React.useCallback((error: Error) => {
-    console.error(error);
-    alert(`Encountered an unexpected error, check the console logs for details: ${error.message}`);
-  }, []);
-  const handleEncryptionError = React.useCallback((error: Error) => {
-    console.error(error);
-    alert(
-      `Encountered an unexpected encryption error, check the console logs for details: ${error.message}`,
-    );
-  }, []);
-
+  // Ép cờ contentHint='detail' trực tiếp vào Track Media
   React.useEffect(() => {
-    if (lowPowerMode) {
-      console.warn('Low power mode enabled');
-    }
-  }, [lowPowerMode]);
+    const handleScreenSharePublished = (publication: any) => {
+      if (
+        publication.source === Track.Source.ScreenShare &&
+        publication.track?.mediaStreamTrack
+      ) {
+        const mst = publication.track.mediaStreamTrack as MediaStreamTrack;
+        if ('contentHint' in mst) {
+          (mst as any).contentHint = 'detail';
+        }
+      }
+    };
+    room.on(RoomEvent.LocalTrackPublished, handleScreenSharePublished);
+    return () => {
+      room.off(RoomEvent.LocalTrackPublished, handleScreenSharePublished);
+    };
+  }, [room]);
+
+  const lowPowerMode = useLowCPUOptimizer(room);
+  const [hideTiles, setHideTiles] = React.useState(false);
 
   return (
-    <div className="lk-room-container">
+    <div className={`lk-room-container ${hideTiles ? 'hide-tiles' : ''}`}>
+      {/* Nút biểu tượng Icon: Con mắt / Con mắt gạch chéo */}
+      <button
+        type="button"
+        onClick={() => setHideTiles(!hideTiles)}
+        className="lk-toggle-tiles-btn"
+        title={hideTiles ? 'Hiện camera thành viên' : 'Ẩn camera thành viên'}
+        aria-label={hideTiles ? 'Hiện camera thành viên' : 'Ẩn camera thành viên'}
+      >
+        {hideTiles ? (
+          /* Biểu tượng CON MẮT MỞ (Bấm để xem lại) */
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0" />
+            <circle cx="12" cy="12" r="3" />
+          </svg>
+        ) : (
+          /* Biểu tượng CON MẮT GẠCH CHÉO (Bấm để ẩn đi) */
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M10.733 5.076a10.744 10.744 0 0 1 11.205 6.575 1 1 0 0 1 0 .696 10.747 10.747 0 0 1-1.444 2.49" />
+            <path d="M14.084 14.158a3 3 0 0 1-4.242-4.242" />
+            <path d="M17.479 17.499a10.75 10.75 0 0 1-15.417-5.151 1 1 0 0 1 0-.696 10.75 10.75 0 0 1 4.446-5.143" />
+            <path d="m2 2 20 20" />
+          </svg>
+        )}
+      </button>
+
       <RoomContext.Provider value={room}>
         <KeyboardShortcuts />
         <VideoConference

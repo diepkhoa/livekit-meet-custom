@@ -1,10 +1,17 @@
+/* ============================================================
+   LỚP HỌC CÔ TUYỀN – DARK SLATE MINIMALIST DESIGN SYSTEM
+   (Linear / Apple / Vercel Aesthetic)
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700&display=swap');
+
 * {
   box-sizing: border-box;
 }
 
 html {
   color-scheme: dark;
-  background-color: #111;
+  background-color: #090d16;
 }
 
 html,
@@ -12,56 +19,1096 @@ body {
   overflow: hidden;
   width: 100%;
   height: 100%;
-  margin: 0px;
+  margin: 0;
+  padding: 0;
+  background-color: #090d16;
+  font-family: 'Nunito', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  color: #f8fafc;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-body {
-  display: flex;
-  flex-direction: column;
+
+/* ============================================================
+   HỆ THỐNG BIẾN SỐ TOÀN CỤC (@livekit/components-styles)
+   ============================================================ */
+:root,
+[data-lk-theme="default"],
+[data-lk-theme] {
+  color-scheme: dark;
+
+  /* 1. Nền & Bề mặt (Slate Minimalist) */
+  --lk-bg: #090d16 !important;
+  --lk-bg2: #0f172a !important;
+  --lk-bg3: #1e293b !important;
+  --lk-bg4: #334155 !important;
+  --lk-bg5: #475569 !important;
+
+  /* 2. Đường viền tinh tế */
+  --lk-border-color: rgba(255, 255, 255, 0.08) !important;
+
+  /* 3. Màu chữ sắc nét */
+  --lk-fg: #f8fafc !important;
+  --lk-fg2: #e2e8f0 !important;
+  --lk-fg3: #cbd5e1 !important;
+  --lk-fg4: #94a3b8 !important;
+  --lk-fg5: #64748b !important;
+
+  /* 4. Màu nhấn chủ đạo (Indigo hiện đại) */
+  --lk-accent-bg: #6366f1 !important;
+  --lk-accent-hover-bg: #4f46e5 !important;
+  --lk-accent-fg: #ffffff !important;
+  --lk-accent2: #4f46e5 !important;
+  --lk-accent3: #4338ca !important;
+  --lk-accent4: #3730a3 !important;
+
+  /* 5. Trạng thái nguy hiểm (Disconnect / Leave) */
+  --lk-danger: #ef4444 !important;
+  --lk-danger2: #dc2626 !important;
+  --lk-danger3: #b91c1c !important;
+  --lk-danger-fg: #ffffff !important;
+
+  /* 6. Bo góc chuẩn mực */
+  --lk-border-radius: 16px !important;
+  --lk-button-border-radius: 12px !important;
+
+  /* 7. Bộ điều khiển Controls */
+  --lk-control-fg: #f8fafc !important;
+  --lk-control-bg: rgba(30, 41, 59, 0.7) !important;
+  --lk-control-hover-bg: rgba(51, 65, 85, 0.85) !important;
+  --lk-control-active-bg: #6366f1 !important;
+  --lk-control-active-hover-bg: #4f46e5 !important;
+  --lk-control-bar-height: 64px !important;
+
+  /* 8. Font chữ & Khoảng cách */
+  --lk-font-family: 'Nunito', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  --lk-grid-gap: 12px !important;
+  --lk-box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7) !important;
 }
 
-.header {
-  max-width: 500px;
-  padding-inline: 2rem;
+/* ============================================================
+   NÚT BẤM CHUNG (.lk-button)
+   ============================================================ */
+.lk-button {
+  font-family: 'Nunito', 'Plus Jakarta Sans', sans-serif !important;
+  border-radius: 12px !important;
+  font-weight: 500 !important;
+  font-size: 13px !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  background-color: rgba(30, 41, 59, 0.7) !important;
+  color: #f8fafc !important;
 }
 
-.header > img {
-  display: block;
-  margin: auto;
-  max-width: 100%;
+.lk-button:hover:not(:disabled) {
+  background-color: rgba(51, 65, 85, 0.9) !important;
+  border-color: rgba(255, 255, 255, 0.15) !important;
+  transform: translateY(-1px) !important;
 }
 
-.header > h2 {
-  font-family: 'TWK Everett', sans-serif;
-  font-style: normal;
-  font-weight: 400;
-  font-size: 1.25rem;
-  line-height: 144%;
-  text-align: center;
-  color: rgba(255, 255, 255, 0.6);
+.lk-button:active:not(:disabled) {
+  transform: translateY(0) !important;
 }
 
-footer {
+.lk-button[aria-pressed='true'] {
+  background-color: #6366f1 !important;
+  border-color: #6366f1 !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 16px rgba(99, 102, 241, 0.35) !important;
+}
+
+/* ============================================================
+   3. PRE-JOIN LOBBY (MÀN HÌNH CHỜ TRƯỚC KHI VÀO LỚP)
+   ============================================================ */
+.lk-main-room {
+  width: 100vw;
+  height: 100vh;
+  background-color: #090d16;
+  position: relative;
+  overflow: hidden;
+}
+
+.lk-prejoin-wrapper {
+  position: relative;
   width: 100%;
-  padding: 1.5rem 2rem;
-  text-align: center;
-  color: rgba(255, 255, 255, 0.6);
-  background-color: var(--lk-bg);
-  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: radial-gradient(circle at 50% 30%, rgba(99, 102, 241, 0.15) 0%, rgba(15, 23, 42, 0) 70%),
+    #090d16;
 }
 
-footer a,
-h2 a {
-  color: #ff6352;
-  text-decoration-color: #a33529;
-  text-underline-offset: 0.125em;
+.lk-prejoin {
+  width: 100% !important;
+  max-width: 460px !important;
+  background: rgba(15, 23, 42, 0.65) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 20px !important;
+  padding: 32px 28px !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 20px !important;
 }
 
-footer a:hover,
-h2 a {
-  text-decoration-color: #ff6352;
+/* Khung xem trước camera (Video Preview) */
+.lk-prejoin .lk-video-container {
+  width: 100% !important;
+  aspect-ratio: 16 / 10 !important;
+  border-radius: 16px !important;
+  overflow: hidden !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  background-color: #050811 !important;
+  box-shadow: 0 12px 24px -6px rgba(0, 0, 0, 0.5) !important;
 }
 
-h2 a {
-  text-decoration: none;
+.lk-prejoin .lk-video-container video {
+  border-radius: 16px !important;
+}
+
+.lk-prejoin .lk-video-container .lk-camera-off-note {
+  background-color: #050811 !important;
+  color: #64748b !important;
+}
+
+/* Các nút bật/tắt Mic và Cam bên dưới khung hình */
+.lk-prejoin .lk-button-group-container {
+  display: flex !important;
+  gap: 12px !important;
+  width: 100% !important;
+}
+
+.lk-prejoin .lk-button-group {
+  flex: 1 !important;
+  height: 42px !important;
+}
+
+.lk-prejoin .lk-button-group>.lk-button {
+  background: rgba(30, 41, 59, 0.6) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: #f8fafc !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+}
+
+.lk-prejoin .lk-button-group>.lk-button:hover {
+  background: rgba(30, 41, 59, 0.9) !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+.lk-prejoin .lk-button-group>.lk-button[aria-pressed='true'] {
+  background: rgba(30, 41, 59, 0.9) !important;
+  border-color: rgba(99, 102, 241, 0.5) !important;
+}
+
+/* Ô nhập tên học sinh */
+.lk-prejoin .lk-username-container {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 8px !important;
+}
+
+.lk-prejoin .lk-username-container label,
+.lk-prejoin label {
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  color: #cbd5e1 !important;
+  margin: 0 !important;
+}
+
+.lk-prejoin input[type='text'],
+.lk-prejoin .lk-form-control {
+  width: 100% !important;
+  background: rgba(30, 41, 59, 0.6) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 12px !important;
+  padding: 12px 16px !important;
+  font-size: 14px !important;
+  color: #ffffff !important;
+  outline: none !important;
+  transition: all 0.2s ease !important;
+  box-sizing: border-box !important;
+}
+
+.lk-prejoin input[type='text']:focus,
+.lk-prejoin .lk-form-control:focus {
+  border-color: #6366f1 !important;
+  background: rgba(30, 41, 59, 0.9) !important;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25) !important;
+}
+
+.lk-prejoin input::placeholder {
+  color: #64748b !important;
+}
+
+/* Nút "Vào Phòng Học" (Join Room) */
+.lk-prejoin .lk-join-button,
+.lk-prejoin button[type='submit'] {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%) !important;
+  color: #ffffff !important;
+  border: none !important;
+  border-radius: 12px !important;
+  padding: 13px 20px !important;
+  font-size: 15px !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35) !important;
+  margin-top: 4px !important;
+}
+
+.lk-prejoin .lk-join-button:hover,
+.lk-prejoin button[type='submit']:hover {
+  transform: translateY(-1px) !important;
+  box-shadow: 0 6px 20px rgba(99, 102, 241, 0.5) !important;
+  background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%) !important;
+}
+
+.lk-prejoin .lk-join-button:active,
+.lk-prejoin button[type='submit']:active {
+  transform: translateY(0) !important;
+}
+
+/* ============================================================
+   4. IN-CALL ROOM (TRONG PHÒNG HỌC & BÀI GIẢNG IPAD)
+   ============================================================ */
+.lk-room-container {
+  width: 100vw !important;
+  height: 100vh !important;
+  background-color: #090d16 !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+.lk-video-conference {
+  width: 100% !important;
+  height: 100% !important;
+  position: relative !important;
+}
+
+.lk-video-conference-inner {
+  width: 100% !important;
+  height: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+/* Layout container chiếm trọn diện tích, để lại khoảng trống nhẹ dưới đáy cho Floating Bar */
+.lk-focus-layout-wrapper,
+.lk-grid-layout-wrapper {
+  width: 100% !important;
+  height: 100% !important;
+  padding: 12px 12px 84px 12px !important;
+  box-sizing: border-box !important;
+}
+
+/* Luồng chia sẻ màn hình iPad (Screen Share) tối đa không gian */
+.lk-focus-layout {
+  width: 100% !important;
+  height: 100% !important;
+  max-height: 100% !important;
+  padding: 0 !important;
+  gap: 12px !important;
+}
+
+.lk-focused-participant {
+  height: 100% !important;
+  border-radius: 16px !important;
+  overflow: hidden !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  background-color: #050811 !important;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.6) !important;
+}
+
+/* Luồng video bài giảng luôn hiển thị nguyên vẹn tỉ lệ */
+.lk-focused-participant video,
+video[data-lk-source='screen_share'] {
+  object-fit: contain !important;
+  background-color: #050811 !important;
+}
+
+/* Các khung Video Tile */
+.lk-participant-tile {
+  border-radius: 16px !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  background-color: #0f172a !important;
+  overflow: hidden !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4) !important;
+  transition: border-color 0.2s ease !important;
+}
+
+.lk-participant-tile[data-lk-speaking='true'] {
+  border-color: #6366f1 !important;
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.4) !important;
+}
+
+.lk-participant-tile .lk-participant-placeholder {
+  background-color: #0f172a !important;
+  color: #64748b !important;
+}
+
+/* Nhãn tên người tham gia (Participant label): Dạng huy hiệu mờ nhỏ góc dưới bên trái */
+.lk-participant-metadata {
+  position: absolute !important;
+  left: 10px !important;
+  bottom: 10px !important;
+  right: auto !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  z-index: 10 !important;
+}
+
+.lk-participant-metadata-item,
+.lk-participant-name {
+  background: rgba(15, 23, 42, 0.75) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 8px !important;
+  padding: 4px 10px !important;
+  color: #f8fafc !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  letter-spacing: -0.01em !important;
+}
+
+/* ============================================================
+   THANH ĐIỀU KHIỂN DƯỚI ĐÁY (.lk-control-bar) – FLOATING ISLAND
+   ============================================================ */
+.lk-control-bar {
+  position: fixed !important;
+  bottom: 20px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  z-index: 100 !important;
+  background: rgba(15, 23, 42, 0.8) !important;
+  backdrop-filter: blur(20px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: 18px !important;
+  padding: 8px 14px !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+  max-width: fit-content !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  height: auto !important;
+  max-height: 60px !important;
+}
+
+/* Nhóm nút chọn nguồn thiết bị (Capsule Button Group) */
+.lk-control-bar .lk-button-group {
+  display: inline-flex !important;
+  align-items: stretch !important;
+  height: 42px !important;
+  border-radius: 12px !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  background: rgba(30, 41, 59, 0.6) !important;
+  overflow: visible !important;
+  transition: all 0.2s ease !important;
+}
+
+.lk-control-bar .lk-button-group:hover {
+  border-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+/* Nút bấm bên trong ControlBar */
+.lk-control-bar .lk-button {
+  height: 42px !important;
+  padding: 0 14px !important;
+  border-radius: 12px !important;
+  background: rgba(30, 41, 59, 0.6) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: #f8fafc !important;
+  font-size: 0 !important;
+  /* Ẩn triệt để text tiếng Anh mặc định */
+  line-height: 0 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  cursor: pointer !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.lk-control-bar .lk-button>svg {
+  width: 19px !important;
+  height: 19px !important;
+  flex-shrink: 0 !important;
+  transition: transform 0.2s ease, color 0.2s ease !important;
+}
+
+.lk-control-bar .lk-button:hover:not(:disabled) {
+  background: rgba(51, 65, 85, 0.9) !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+  transform: translateY(-1px) !important;
+}
+
+/* Nút chính bên trong nhóm (Mic / Cam) */
+.lk-control-bar .lk-button-group>.lk-button:first-child {
+  border-radius: 11px 0 0 11px !important;
+  border: none !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Nút mũi tên chọn nguồn thiết bị */
+.lk-control-bar .lk-button-group-menu {
+  position: relative !important;
+}
+
+.lk-control-bar .lk-button-group-menu>.lk-button {
+  border-radius: 0 11px 11px 0 !important;
+  border: none !important;
+  padding: 0 10px !important;
+  font-size: 0 !important;
+  color: #94a3b8 !important;
+  background: transparent !important;
+}
+
+.lk-control-bar .lk-button-group-menu>.lk-button:hover {
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: #ffffff !important;
+}
+
+.lk-control-bar .lk-button-menu::after {
+  content: "" !important;
+  display: inline-block !important;
+  width: 6px !important;
+  height: 6px !important;
+  border-left: 2px solid currentColor !important;
+  border-bottom: 2px solid currentColor !important;
+  transform: rotate(-45deg) !important;
+  margin-top: -3px !important;
+  margin-left: 0 !important;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   TÍN HIỆU RÕ RÀNG KHI BẬT / TẮT MICRO VÀ CAMERA
+   ───────────────────────────────────────────────────────────── */
+
+/* MICRO: Khi ĐANG TẮT (Muted / Disabled) -> Cảnh báo đỏ cam dịu */
+.lk-control-bar .lk-button[data-lk-source='microphone'][data-lk-enabled='false'],
+.lk-control-bar .lk-button[data-lk-source='microphone'][aria-pressed='false'] {
+  background: rgba(239, 68, 68, 0.16) !important;
+  border-color: rgba(239, 68, 68, 0.4) !important;
+}
+
+.lk-control-bar .lk-button[data-lk-source='microphone'][data-lk-enabled='false']>svg,
+.lk-control-bar .lk-button[data-lk-source='microphone'][aria-pressed='false']>svg {
+  color: #f87171 !important;
+}
+
+.lk-control-bar .lk-button[data-lk-source='microphone'][data-lk-enabled='false']::after,
+.lk-control-bar .lk-button[data-lk-source='microphone'][aria-pressed='false']::after {
+  content: 'Micro' !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  color: #fca5a5 !important;
+}
+
+/* MICRO: Khi ĐANG BẬT (Active / Enabled) -> Tín hiệu Indigo sáng */
+.lk-control-bar .lk-button[data-lk-source='microphone'][data-lk-enabled='true'],
+.lk-control-bar .lk-button[data-lk-source='microphone'][aria-pressed='true'] {
+  background: rgba(99, 102, 241, 0.22) !important;
+  border-color: rgba(99, 102, 241, 0.6) !important;
+  box-shadow: 0 0 14px rgba(99, 102, 241, 0.3) !important;
+}
+
+.lk-control-bar .lk-button[data-lk-source='microphone'][data-lk-enabled='true']>svg,
+.lk-control-bar .lk-button[data-lk-source='microphone'][aria-pressed='true']>svg {
+  color: #818cf8 !important;
+}
+
+.lk-control-bar .lk-button[data-lk-source='microphone'][data-lk-enabled='true']::after,
+.lk-control-bar .lk-button[data-lk-source='microphone'][aria-pressed='true']::after {
+  content: 'Micro' !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  color: #ffffff !important;
+}
+
+/* CAMERA: Khi ĐANG TẮT (Camera Off) -> Cảnh báo đỏ cam dịu */
+.lk-control-bar .lk-button[data-lk-source='camera'][data-lk-enabled='false'],
+.lk-control-bar .lk-button[data-lk-source='camera'][aria-pressed='false'] {
+  background: rgba(239, 68, 68, 0.16) !important;
+  border-color: rgba(239, 68, 68, 0.4) !important;
+}
+
+.lk-control-bar .lk-button[data-lk-source='camera'][data-lk-enabled='false']>svg,
+.lk-control-bar .lk-button[data-lk-source='camera'][aria-pressed='false']>svg {
+  color: #f87171 !important;
+}
+
+.lk-control-bar .lk-button[data-lk-source='camera'][data-lk-enabled='false']::after,
+.lk-control-bar .lk-button[data-lk-source='camera'][aria-pressed='false']::after {
+  content: 'Camera' !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  color: #fca5a5 !important;
+}
+
+/* CAMERA: Khi ĐANG BẬT (Camera On) -> Tín hiệu Indigo sáng */
+.lk-control-bar .lk-button[data-lk-source='camera'][data-lk-enabled='true'],
+.lk-control-bar .lk-button[data-lk-source='camera'][aria-pressed='true'] {
+  background: rgba(99, 102, 241, 0.22) !important;
+  border-color: rgba(99, 102, 241, 0.6) !important;
+  box-shadow: 0 0 14px rgba(99, 102, 241, 0.3) !important;
+}
+
+.lk-control-bar .lk-button[data-lk-source='camera'][data-lk-enabled='true']>svg,
+.lk-control-bar .lk-button[data-lk-source='camera'][aria-pressed='true']>svg {
+  color: #818cf8 !important;
+}
+
+.lk-control-bar .lk-button[data-lk-source='camera'][data-lk-enabled='true']::after,
+.lk-control-bar .lk-button[data-lk-source='camera'][aria-pressed='true']::after {
+  content: 'Camera' !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  color: #ffffff !important;
+}
+
+/* CHIA SẺ MÀN HÌNH: Viết đầy đủ & Tín hiệu nổi bật */
+.lk-control-bar .lk-button[data-lk-source='screen_share']::after {
+  content: 'Chia sẻ màn hình' !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  color: #f8fafc !important;
+}
+
+.lk-control-bar .lk-button[data-lk-source='screen_share'][data-lk-enabled='true'],
+.lk-control-bar .lk-button[data-lk-source='screen_share'][aria-pressed='true'] {
+  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%) !important;
+  border-color: #818cf8 !important;
+  box-shadow: 0 0 18px rgba(99, 102, 241, 0.6) !important;
+}
+
+.lk-control-bar .lk-button[data-lk-source='screen_share'][data-lk-enabled='true']::after,
+.lk-control-bar .lk-button[data-lk-source='screen_share'][aria-pressed='true']::after {
+  color: #ffffff !important;
+  font-weight: 600 !important;
+}
+
+/* NÚT CHAT: Gọn gàng và tinh tế */
+.lk-control-bar .lk-chat-toggle::after {
+  content: 'Chat' !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  color: #f8fafc !important;
+}
+
+.lk-control-bar .lk-chat-toggle[aria-pressed='true'] {
+  background: rgba(99, 102, 241, 0.25) !important;
+  border-color: #6366f1 !important;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   NÚT RỜI LỚP HỌC
+   ───────────────────────────────────────────────────────────── */
+.lk-control-bar .lk-disconnect-button,
+.lk-disconnect-button,
+button.lk-disconnect-button {
+  font-size: 0 !important;
+  line-height: 0 !important;
+  color: transparent !important;
+  background: rgba(239, 68, 68, 0.16) !important;
+  border: 1px solid rgba(239, 68, 68, 0.4) !important;
+  padding: 0 16px !important;
+  border-radius: 12px !important;
+  height: 42px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+}
+
+.lk-control-bar .lk-disconnect-button>svg,
+.lk-disconnect-button>svg {
+  width: 18px !important;
+  height: 18px !important;
+  color: #f87171 !important;
+  flex-shrink: 0 !important;
+}
+
+.lk-control-bar .lk-disconnect-button::after,
+.lk-disconnect-button::after {
+  content: 'Rời lớp học' !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  color: #fca5a5 !important;
+  line-height: 1 !important;
+  white-space: nowrap !important;
+}
+
+.lk-control-bar .lk-disconnect-button:hover,
+.lk-disconnect-button:hover {
+  background: #ef4444 !important;
+  border-color: #ef4444 !important;
+  box-shadow: 0 4px 16px rgba(239, 68, 68, 0.5) !important;
+  transform: translateY(-1px) !important;
+}
+
+.lk-control-bar .lk-disconnect-button:hover>svg,
+.lk-disconnect-button:hover>svg,
+.lk-control-bar .lk-disconnect-button:hover::after,
+.lk-disconnect-button:hover::after {
+  color: #ffffff !important;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   MENU CHỌN NGUỒN MICRO VÀ CAMERA (Trau chuốt cao cấp)
+   ───────────────────────────────────────────────────────────── */
+.lk-device-menu {
+  position: absolute !important;
+  bottom: calc(100% + 14px) !important;
+  top: auto !important;
+  left: 0 !important;
+  background: rgba(15, 23, 42, 0.95) !important;
+  backdrop-filter: blur(24px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.85), 0 0 0 1px rgba(255, 255, 255, 0.05) !important;
+  padding: 10px !important;
+  min-width: 240px !important;
+  z-index: 1000 !important;
+  animation: lk-menu-fade-in 0.18s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+@keyframes lk-menu-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.lk-device-menu-heading {
+  color: #94a3b8 !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+  padding: 6px 12px 8px !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
+  margin-bottom: 6px !important;
+}
+
+.lk-media-device-select {
+  list-style: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.lk-media-device-select li {
+  margin-bottom: 2px !important;
+}
+
+.lk-media-device-select li>.lk-button {
+  font-size: 13px !important;
+  line-height: 1.4 !important;
+  border-radius: 10px !important;
+  border: 1px solid transparent !important;
+  background: transparent !important;
+  padding: 8px 12px !important;
+  color: #cbd5e1 !important;
+  width: 100% !important;
+  justify-content: flex-start !important;
+  text-align: left !important;
+  white-space: normal !important;
+  height: auto !important;
+}
+
+.lk-media-device-select li>.lk-button:hover {
+  background: rgba(51, 65, 85, 0.6) !important;
+  color: #ffffff !important;
+}
+
+.lk-media-device-select [data-lk-active='true']>.lk-button {
+  background: rgba(99, 102, 241, 0.22) !important;
+  color: #ffffff !important;
+  border-color: rgba(99, 102, 241, 0.5) !important;
+  font-weight: 600 !important;
+}
+
+/* ============================================================
+   CHAT PANEL & SETTINGS MODAL
+   ============================================================ */
+.lk-chat {
+  background: rgba(15, 23, 42, 0.95) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border-left: 1px solid rgba(255, 255, 255, 0.08) !important;
+  box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5) !important;
+}
+
+.lk-chat-header {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  font-size: 15px !important;
+}
+
+.lk-chat-form {
+  border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+  padding: 12px !important;
+  background: rgba(15, 23, 42, 0.8) !important;
+}
+
+.lk-chat-form-input {
+  background: rgba(30, 41, 59, 0.6) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 10px !important;
+  padding: 10px 14px !important;
+  color: #ffffff !important;
+  font-size: 13px !important;
+}
+
+.lk-chat-form-input:focus {
+  border-color: #6366f1 !important;
+  outline: none !important;
+}
+
+.lk-chat-entry[data-lk-message-origin='local'] .lk-message-body {
+  background: #6366f1 !important;
+  color: #ffffff !important;
+  border-radius: 12px 12px 2px 12px !important;
+  font-size: 14px !important;
+}
+
+.lk-chat-entry[data-lk-message-origin='remote'] .lk-message-body {
+  background: #1e293b !important;
+  color: #f8fafc !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 12px 12px 12px 2px !important;
+  font-size: 14px !important;
+}
+
+.lk-settings-menu-modal {
+  background: rgba(15, 23, 42, 0.95) !important;
+  backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 20px !important;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.8) !important;
+  color: #f8fafc !important;
+}
+
+/* Ép trình duyệt khử mờ, giữ độ sắc nét của chữ trong luồng chia sẻ màn hình */
+.lk-video-container video,
+.lk-participant-tile video {
+  image-rendering: -webkit-optimize-contrast !important;
+  image-rendering: crisp-edges !important;
+}
+
+/* =====================================================================
+   CHẾ ĐỘ TRÀN VIỀN TOÀN MÀN HÌNH KHI CHIA SẺ (THEATER / FULL-STAGE MODE)
+   ===================================================================== */
+
+/* 1. Ép khung bài giảng chiếm trọn vẹn 100% chiều ngang và chiều dọc */
+.lk-focus-layout {
+  position: relative !important;
+  width: 100% !important;
+  height: 100% !important;
+  display: block !important;
+}
+
+/* 2. Biến cột danh sách thành viên bên trái thành các ô nhỏ nổi ở góc */
+.lk-focus-layout .lk-carousel {
+  position: absolute !important;
+  top: 16px !important;
+  left: 16px !important;
+  width: auto !important;
+  height: auto !important;
+  max-height: calc(100% - 120px) !important;
+  z-index: 30 !important;
+  background: transparent !important;
+  border: none !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 10px !important;
+  pointer-events: auto !important;
+}
+
+/* 3. Thu nhỏ avatar thành viên (dạng PiP nhỏ gọn, không che bài giảng) */
+.lk-focus-layout .lk-carousel .lk-participant-tile {
+  width: 140px !important;
+  height: 85px !important;
+  border-radius: 12px !important;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  backdrop-filter: blur(8px) !important;
+  overflow: hidden !important;
+}
+
+/* 4. Khung bài giảng bung rộng tối đa, xóa bỏ các khoảng cách đen */
+.lk-focus-layout .lk-focused-participant,
+.lk-focus-layout>div:last-child {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100% !important;
+}
+
+/* Nút bấm Icon tròn nhỏ gọn ở góc trên bên trái */
+.lk-toggle-tiles-btn {
+  position: absolute;
+  top: 14px;
+  left: 16px;
+  z-index: 50;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #cbd5e1;
+  border-radius: 50%;
+  /* Bo tròn hoàn toàn thành nút Icon */
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.lk-toggle-tiles-btn:hover {
+  background: rgba(30, 41, 59, 0.95);
+  color: #ffffff;
+  transform: scale(1.05);
+  /* Hơi phóng to nhẹ khi rê chuột vào */
+  border-color: rgba(99, 102, 241, 0.5);
+  /* Viền sáng nhẹ màu tím Indigo */
+}
+
+.lk-toggle-tiles-btn:active {
+  transform: scale(0.95);
+}
+
+/* Đẩy 2 ô camera xuống dưới nút một chút cho thẳng hàng */
+.lk-focus-layout .lk-carousel {
+  top: 58px !important;
+}
+
+/* Khi bấm ẩn: 2 ô camera biến mất hoàn toàn */
+.hide-tiles .lk-carousel {
+  display: none !important;
+}
+
+/* =====================================================================
+   ĐỒNG BỘ NÚT BẤM VÀ MENU THIẾT BỊ Ở PHÒNG CHỜ (.LK-PREJOIN)
+   (Áp dụng chuẩn màu sắc và hiệu ứng kính mờ từ bên trong phòng học)
+   ===================================================================== */
+
+/* 1. KHUNG NHÓM NÚT BẤM (BUTTON GROUP Ở PREJOIN) */
+.lk-prejoin .lk-button-group {
+  border-radius: 12px !important;
+  overflow: visible !important;
+  /* Để menu thiết bị xổ ra không bị che */
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  background: rgba(30, 41, 59, 0.6) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+  transition: all 0.2s ease-in-out !important;
+  position: relative !important;
+}
+
+.lk-prejoin .lk-button-group .lk-button {
+  background: transparent !important;
+  border: none !important;
+  font-size: 13px !important;
+  padding: 8px 14px !important;
+  transition: all 0.2s ease !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+/* Nút mũi tên xổ xuống */
+.lk-prejoin .lk-button-group .lk-button-group-menu {
+  padding: 8px 10px !important;
+  border-left: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   MICRO: KHI ĐANG TẮT (MUTED) -> CẢNH BÁO ĐỎ CAM DỊU
+   ───────────────────────────────────────────────────────────── */
+.lk-prejoin .lk-button-group:has([data-lk-source='microphone'][data-lk-enabled='false']),
+.lk-prejoin .lk-button-group:has([data-lk-source='microphone'][aria-pressed='false']) {
+  background: rgba(239, 68, 68, 0.16) !important;
+  border-color: rgba(239, 68, 68, 0.4) !important;
+}
+
+.lk-prejoin .lk-button-group:has([data-lk-source='microphone'][data-lk-enabled='false']) .lk-button,
+.lk-prejoin .lk-button-group:has([data-lk-source='microphone'][aria-pressed='false']) .lk-button {
+  color: #fca5a5 !important;
+  font-weight: 500 !important;
+}
+
+.lk-prejoin .lk-button-group:has([data-lk-source='microphone'][data-lk-enabled='false']) svg,
+.lk-prejoin .lk-button-group:has([data-lk-source='microphone'][aria-pressed='false']) svg {
+  color: #f87171 !important;
+}
+
+.lk-prejoin .lk-button-group:has([data-lk-source='microphone'][data-lk-enabled='false']) .lk-button-group-menu,
+.lk-prejoin .lk-button-group:has([data-lk-source='microphone'][aria-pressed='false']) .lk-button-group-menu {
+  border-left-color: rgba(239, 68, 68, 0.3) !important;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   MICRO: KHI ĐANG BẬT (ACTIVE) -> TÍN HIỆU INDIGO PHÁT SÁNG
+   ───────────────────────────────────────────────────────────── */
+.lk-prejoin .lk-button-group:has([data-lk-source='microphone'][data-lk-enabled='true']),
+.lk-prejoin .lk-button-group:has([data-lk-source='microphone'][aria-pressed='true']) {
+  background: rgba(99, 102, 241, 0.22) !important;
+  border-color: rgba(99, 102, 241, 0.6) !important;
+  box-shadow: 0 0 14px rgba(99, 102, 241, 0.3) !important;
+}
+
+.lk-prejoin .lk-button-group:has([data-lk-source='microphone'][data-lk-enabled='true']) .lk-button,
+.lk-prejoin .lk-button-group:has([data-lk-source='microphone'][aria-pressed='true']) .lk-button {
+  color: #ffffff !important;
+  font-weight: 600 !important;
+}
+
+.lk-prejoin .lk-button-group:has([data-lk-source='microphone'][data-lk-enabled='true']) svg,
+.lk-prejoin .lk-button-group:has([data-lk-source='microphone'][aria-pressed='true']) svg {
+  color: #818cf8 !important;
+}
+
+.lk-prejoin .lk-button-group:has([data-lk-source='microphone'][data-lk-enabled='true']) .lk-button-group-menu,
+.lk-prejoin .lk-button-group:has([data-lk-source='microphone'][aria-pressed='true']) .lk-button-group-menu {
+  border-left-color: rgba(99, 102, 241, 0.4) !important;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   CAMERA: KHI ĐANG TẮT (CAMERA OFF) -> CẢNH BÁO ĐỎ CAM DỊU
+   ───────────────────────────────────────────────────────────── */
+.lk-prejoin .lk-button-group:has([data-lk-source='camera'][data-lk-enabled='false']),
+.lk-prejoin .lk-button-group:has([data-lk-source='camera'][aria-pressed='false']) {
+  background: rgba(239, 68, 68, 0.16) !important;
+  border-color: rgba(239, 68, 68, 0.4) !important;
+}
+
+.lk-prejoin .lk-button-group:has([data-lk-source='camera'][data-lk-enabled='false']) .lk-button,
+.lk-prejoin .lk-button-group:has([data-lk-source='camera'][aria-pressed='false']) .lk-button {
+  color: #fca5a5 !important;
+  font-weight: 500 !important;
+}
+
+.lk-prejoin .lk-button-group:has([data-lk-source='camera'][data-lk-enabled='false']) svg,
+.lk-prejoin .lk-button-group:has([data-lk-source='camera'][aria-pressed='false']) svg {
+  color: #f87171 !important;
+}
+
+.lk-prejoin .lk-button-group:has([data-lk-source='camera'][data-lk-enabled='false']) .lk-button-group-menu,
+.lk-prejoin .lk-button-group:has([data-lk-source='camera'][aria-pressed='false']) .lk-button-group-menu {
+  border-left-color: rgba(239, 68, 68, 0.3) !important;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   CAMERA: KHI ĐANG BẬT (CAMERA ON) -> TÍN HIỆU INDIGO PHÁT SÁNG
+   ───────────────────────────────────────────────────────────── */
+.lk-prejoin .lk-button-group:has([data-lk-source='camera'][data-lk-enabled='true']),
+.lk-prejoin .lk-button-group:has([data-lk-source='camera'][aria-pressed='true']) {
+  background: rgba(99, 102, 241, 0.22) !important;
+  border-color: rgba(99, 102, 241, 0.6) !important;
+  box-shadow: 0 0 14px rgba(99, 102, 241, 0.3) !important;
+}
+
+.lk-prejoin .lk-button-group:has([data-lk-source='camera'][data-lk-enabled='true']) .lk-button,
+.lk-prejoin .lk-button-group:has([data-lk-source='camera'][aria-pressed='true']) .lk-button {
+  color: #ffffff !important;
+  font-weight: 600 !important;
+}
+
+.lk-prejoin .lk-button-group:has([data-lk-source='camera'][data-lk-enabled='true']) svg,
+.lk-prejoin .lk-button-group:has([data-lk-source='camera'][aria-pressed='true']) svg {
+  color: #818cf8 !important;
+}
+
+.lk-prejoin .lk-button-group:has([data-lk-source='camera'][data-lk-enabled='true']) .lk-button-group-menu,
+.lk-prejoin .lk-button-group:has([data-lk-source='camera'][aria-pressed='true']) .lk-button-group-menu {
+  border-left-color: rgba(99, 102, 241, 0.4) !important;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   MENU CHỌN THIẾT BỊ XỔ XUỐNG Ở PHÒNG CHỜ (ĐỒNG BỘ 100% KÍNH MỜ)
+   ───────────────────────────────────────────────────────────── */
+.lk-prejoin .lk-device-menu {
+  position: absolute !important;
+  top: calc(100% + 10px) !important;
+  /* Ở phòng chờ thì xổ xuống dưới nút */
+  bottom: auto !important;
+  left: 0 !important;
+  background: rgba(15, 23, 42, 0.95) !important;
+  backdrop-filter: blur(24px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.85), 0 0 0 1px rgba(255, 255, 255, 0.05) !important;
+  padding: 10px !important;
+  min-width: 240px !important;
+  z-index: 1000 !important;
+  animation: lk-menu-fade-in 0.18s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.lk-prejoin .lk-device-menu-heading {
+  color: #94a3b8 !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+  padding: 6px 12px 8px !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
+  margin-bottom: 6px !important;
+}
+
+.lk-prejoin .lk-media-device-select {
+  list-style: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.lk-prejoin .lk-media-device-select li {
+  margin-bottom: 2px !important;
+}
+
+.lk-prejoin .lk-media-device-select li>.lk-button {
+  font-size: 13px !important;
+  line-height: 1.4 !important;
+  border-radius: 10px !important;
+  border: 1px solid transparent !important;
+  background: transparent !important;
+  padding: 8px 12px !important;
+  color: #cbd5e1 !important;
+  width: 100% !important;
+  justify-content: flex-start !important;
+  text-align: left !important;
+  white-space: normal !important;
+  height: auto !important;
+}
+
+.lk-prejoin .lk-media-device-select li>.lk-button:hover {
+  background: rgba(51, 65, 85, 0.6) !important;
+  color: #ffffff !important;
+}
+
+.lk-prejoin .lk-media-device-select [data-lk-active='true']>.lk-button {
+  background: rgba(99, 102, 241, 0.22) !important;
+  color: #ffffff !important;
+  border-color: rgba(99, 102, 241, 0.5) !important;
+  font-weight: 600 !important;
 }
