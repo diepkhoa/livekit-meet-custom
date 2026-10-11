@@ -58,19 +58,29 @@ export async function GET(req: NextRequest) {
 
         const teacherName = userData.name || userData.given_name || 'Giáo viên';
 
-        // 4. TẠO CHỮ KÝ SỐ CHO COOKIE (Chống giả mạo 100%)
+        // 1. Ký số phiên làm việc
         const signedSessionCookie = signData(
             { name: teacherName, email: userEmail, timestamp: Date.now() },
             signingSecret
         );
 
         const response = NextResponse.redirect(appUrl);
+
+        // 2. COOKIE 1: CHỨA CHỮ KÝ BẢO MẬT (Khóa chặt HttpOnly, JavaScript không thể đọc trộm)
         response.cookies.set('teacher_session', signedSessionCookie, {
             path: '/',
-            httpOnly: false, // Để frontend đọc được tên hiển thị
-            maxAge: 60 * 60 * 24 * 7, // 7 ngày
-            sameSite: 'lax',
+            httpOnly: true, // <--- BẢO MẬT TUYỆT ĐỐI CHỐNG XSS
             secure: process.env.NODE_ENV === 'production',
+            maxAge: 60 * 60 * 24 * 7,
+            sameSite: 'lax',
+        });
+
+        // 3. COOKIE 2: CHỈ CHỨA TÊN ĐỂ REACT HIỂN THỊ LÊN MÀN HÌNH (Không có giá trị xác thực)
+        response.cookies.set('teacher_profile', JSON.stringify({ name: teacherName }), {
+            path: '/',
+            httpOnly: false,
+            maxAge: 60 * 60 * 24 * 7,
+            sameSite: 'lax',
         });
 
         return response;

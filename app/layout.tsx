@@ -4,6 +4,14 @@ import '@livekit/components-styles/prefabs';
 import type { Metadata, Viewport } from 'next';
 import { Toaster } from 'react-hot-toast';
 
+import { Nunito } from 'next/font/google';
+
+const nunito = Nunito({
+  subsets: ['latin', 'vietnamese'],
+  weight: ['400', '500', '600', '700'],
+  display: 'swap',
+});
+
 export const metadata: Metadata = {
   title: {
     default: 'Lớp Học Cô Tuyền',

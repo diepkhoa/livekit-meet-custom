@@ -16,17 +16,18 @@ export default function Home() {
   const [teacher, setTeacher] = useState<TeacherInfo | null>(null);
 
   // Tự động kiểm tra xem Giáo viên đã đăng nhập Google chưa qua Cookie
+  // Tự động đọc tên giáo viên từ cookie teacher_profile (hỗ trợ 100% tiếng Việt có dấu)
   useEffect(() => {
     const cookies = document.cookie.split('; ');
-    const sessionCookie = cookies.find((row) => row.startsWith('teacher_session='));
-    if (sessionCookie) {
+    // Đọc đúng cookie teacher_profile
+    const profileCookie = cookies.find((row) => row.startsWith('teacher_profile='));
+
+    if (profileCookie) {
       try {
-        const rawValue = decodeURIComponent(sessionCookie.split('=')[1]);
-        // Bóc tách phần payload trước dấu chấm:
-        const payloadBase64 = rawValue.split('.')[0];
-        // Giải mã chuỗi base64url trên trình duyệt:
-        const jsonString = atob(payloadBase64.replace(/-/g, '+').replace(/_/g, '/'));
-        const data = JSON.parse(jsonString);
+        const rawValue = profileCookie.split('=')[1];
+        // Giải mã UTF-8 an toàn cho tiếng Việt, không dùng atob
+        const decodedString = decodeURIComponent(rawValue);
+        const data = JSON.parse(decodedString);
 
         setTeacher(data);
         setParticipantName(data.name);

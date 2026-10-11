@@ -58,21 +58,20 @@ export async function GET(request: NextRequest) {
     let finalParticipantName = participantName;
 
     if (teacherCookie) {
-      // Giải mã và kiểm tra chữ ký số bằng apiSecret của server
       const verifiedSession = verifySignedData(teacherCookie.value, apiSecret);
 
-      if (verifiedSession && verifiedSession.email) {
+      // Kiểm tra chữ ký VÀ kiểm tra thời hạn session (trong vòng 7 ngày)
+      const isExpired = verifiedSession?.timestamp && (Date.now() - verifiedSession.timestamp > 7 * 24 * 60 * 60 * 1000);
+
+      if (verifiedSession && verifiedSession.email && !isExpired) {
         const allowedTeachers = (process.env.ALLOWED_TEACHERS || '')
           .split(',')
           .map((e) => e.trim().toLowerCase());
 
-        // Kiểm tra xem email đã được xác minh có nằm trong danh sách cấp phép không
         if (allowedTeachers.includes(verifiedSession.email.toLowerCase())) {
           isTeacher = true;
-          finalParticipantName = verifiedSession.name; // Ép dùng đúng tên Google của giáo viên
+          finalParticipantName = verifiedSession.name; // Luôn dùng tên Google chính chủ
         }
-      } else if (teacherCookie.value) {
-        console.warn('[CẢNH BÁO AN NINH] Phát hiện Cookie teacher_session bị chỉnh sửa trái phép!');
       }
     }
 
