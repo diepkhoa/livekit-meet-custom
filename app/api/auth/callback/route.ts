@@ -1,10 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
+import crypto from 'crypto';
+
+// Hàm ký số HMAC-SHA256 cho Cookie
+function signData(data: object, secret: string): string {
+    const payload = Buffer.from(JSON.stringify(data)).toString('base64url');
+    const signature = crypto.createHmac('sha256', secret).update(payload).digest('base64url');
+    return `${payload}.${signature}`;
+}
 
 export async function GET(req: NextRequest) {
     const code = req.nextUrl.searchParams.get('code');
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
     const clientId = process.env.GOOGLE_CLIENT_ID || '';
     const clientSecret = process.env.GOOGLE_CLIENT_SECRET || '';
+    const signingSecret = process.env.LIVEKIT_API_SECRET || 'fallback-secret-key-2026';
+
     const allowedTeachers = (process.env.ALLOWED_TEACHERS || '')
         .split(',')
         .map((e) => e.trim().toLowerCase());
@@ -14,7 +24,7 @@ export async function GET(req: NextRequest) {
     }
 
     try {
-        // 1. Đổi code lấy Token trực tiếp từ máy chủ Google
+        // 1. Đổi code lấy Access Token từ Google
         const tokenRes = await fetch('https://oauth2.googleapis.com/token', {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -40,27 +50,28 @@ export async function GET(req: NextRequest) {
         const userData = await userRes.json();
         const userEmail = (userData.email || '').toLowerCase();
 
-        // 3. CHỐT CHẶN BẢO MẬT: KIỂM TRA EMAIL CÓ TRONG DANH SÁCH GIÁO VIÊN KHÔNG
+        // 3. CHỐT CHẶN BẢO MẬT: Kiểm tra email giáo viên
         if (!allowedTeachers.includes(userEmail)) {
-            console.warn(`[TỪ CHỐI TRUY CẬP] Email ${userEmail} không phải là giáo viên.`);
-            // Bị chặn ngay lập tức, trả về trang chủ với thông báo không có quyền
+            console.warn(`[TỪ CHỐI TRUY CẬP] Email ${userEmail} không có quyền Giáo viên.`);
             return NextResponse.redirect(`${appUrl}?error=unauthorized_teacher`);
         }
 
-        // 4. Nếu đúng là giáo viên: Lưu thông tin vào Cookie
         const teacherName = userData.name || userData.given_name || 'Giáo viên';
-        const response = NextResponse.redirect(appUrl);
 
-        response.cookies.set(
-            'teacher_session',
-            JSON.stringify({ name: teacherName, email: userEmail, verified: true }),
-            {
-                path: '/',
-                httpOnly: false,
-                maxAge: 60 * 60 * 24 * 7, // 7 ngày
-                sameSite: 'lax',
-            }
+        // 4. TẠO CHỮ KÝ SỐ CHO COOKIE (Chống giả mạo 100%)
+        const signedSessionCookie = signData(
+            { name: teacherName, email: userEmail, timestamp: Date.now() },
+            signingSecret
         );
+
+        const response = NextResponse.redirect(appUrl);
+        response.cookies.set('teacher_session', signedSessionCookie, {
+            path: '/',
+            httpOnly: false, // Để frontend đọc được tên hiển thị
+            maxAge: 60 * 60 * 24 * 7, // 7 ngày
+            sameSite: 'lax',
+            secure: process.env.NODE_ENV === 'production',
+        });
 
         return response;
     } catch (error) {

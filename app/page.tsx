@@ -21,9 +21,15 @@ export default function Home() {
     const sessionCookie = cookies.find((row) => row.startsWith('teacher_session='));
     if (sessionCookie) {
       try {
-        const data = JSON.parse(decodeURIComponent(sessionCookie.split('=')[1]));
+        const rawValue = decodeURIComponent(sessionCookie.split('=')[1]);
+        // Bóc tách phần payload trước dấu chấm:
+        const payloadBase64 = rawValue.split('.')[0];
+        // Giải mã chuỗi base64url trên trình duyệt:
+        const jsonString = atob(payloadBase64.replace(/-/g, '+').replace(/_/g, '/'));
+        const data = JSON.parse(jsonString);
+
         setTeacher(data);
-        setParticipantName(data.name); // Tự động lấy tên Google làm tên trong lớp
+        setParticipantName(data.name);
       } catch (e) {
         console.error('Lỗi đọc session:', e);
       }
