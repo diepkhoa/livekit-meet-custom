@@ -14,7 +14,7 @@ const nunito = Nunito({
 
 export const metadata: Metadata = {
   title: {
-    default: 'Lớp Học Cô Tuyền',
+    default: 'Nice to meet you',
     template: '%s | Lớp Học Cô Tuyền',
   },
   description:

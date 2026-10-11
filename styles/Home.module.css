@@ -24,7 +24,7 @@
   padding: 24px;
 
   background:
-    /*linear-gradient(rgba(9, 13, 22, 0.75), rgba(9, 13, 22, 0.85)),*/
+    linear-gradient(rgba(9, 13, 22, 0.75), rgba(9, 13, 22, 0.85)),
     url('/background-images/bg.jpg');
   /* ĐƯỜNG DẪN BẮT ĐẦU BẰNG DẤU GẠCH CHÉO '/' */
   background-size: cover;
