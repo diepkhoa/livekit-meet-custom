@@ -30,6 +30,9 @@ import {
 import { useRouter } from 'next/navigation';
 import { useSetupE2EE } from '@/lib/useSetupE2EE';
 import { useLowCPUOptimizer } from '@/lib/usePerfomanceOptimiser';
+import { CustomControlBar } from '@/components/CustomControlBar';
+import { CustomChat } from '@/components/CustomChat';
+
 
 const CONN_DETAILS_ENDPOINT =
   process.env.NEXT_PUBLIC_CONN_DETAILS_ENDPOINT ?? '/api/connection-details';
@@ -168,7 +171,14 @@ function VideoConferenceComponent(props: {
   const room = React.useMemo(() => new Room(roomOptions), [roomOptions]);
 
   const router = useRouter();
-  const handleOnLeave = React.useCallback(() => router.push('/'), [router]);
+  const [isLeaving, setIsLeaving] = React.useState(false);
+  const [isChatOpen, setIsChatOpen] = React.useState(false);
+
+  const handleOnLeave = React.useCallback(() => {
+    setIsLeaving(true);
+    router.push('/');
+  }, [router]);
+
   const handleError = React.useCallback((error: Error) => {
     console.error(error);
     alert(`Lỗi không mong đợi: ${error.message}`);
@@ -259,43 +269,25 @@ function VideoConferenceComponent(props: {
   const lowPowerMode = useLowCPUOptimizer(room);
   const [hideTiles, setHideTiles] = React.useState(false);
 
+  if (isLeaving) {
+    return <div style={{ background: '#090d16', minHeight: '100vh' }} />;
+  }
   return (
     <div className={`lk-room-container ${hideTiles ? 'hide-tiles' : ''}`}>
-      {/* Nút biểu tượng Icon: Con mắt / Con mắt gạch chéo */}
+      {/* Nút mắt ở góc trên bên trái */}
       <button
         type="button"
         onClick={() => setHideTiles(!hideTiles)}
         className="lk-toggle-tiles-btn"
         title={hideTiles ? 'Hiện camera thành viên' : 'Ẩn camera thành viên'}
-        aria-label={hideTiles ? 'Hiện camera thành viên' : 'Ẩn camera thành viên'}
       >
         {hideTiles ? (
-          /* Biểu tượng CON MẮT MỞ (Bấm để xem lại) */
-          <svg
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
             <path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0" />
             <circle cx="12" cy="12" r="3" />
           </svg>
         ) : (
-          /* Biểu tượng CON MẮT GẠCH CHÉO (Bấm để ẩn đi) */
-          <svg
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
             <path d="M10.733 5.076a10.744 10.744 0 0 1 11.205 6.575 1 1 0 0 1 0 .696 10.747 10.747 0 0 1-1.444 2.49" />
             <path d="M14.084 14.158a3 3 0 0 1-4.242-4.242" />
             <path d="M17.479 17.499a10.75 10.75 0 0 1-15.417-5.151 1 1 0 0 1 0-.696 10.75 10.75 0 0 1 4.446-5.143" />
@@ -310,6 +302,10 @@ function VideoConferenceComponent(props: {
           chatMessageFormatter={formatChatMessageLinks}
           SettingsComponent={SHOW_SETTINGS_MENU ? SettingsMenu : undefined}
         />
+
+        {/* 👉 THANH ĐIỀU KHIỂN CUSTOM CỦA BẠN: */}
+        <CustomControlBar />
+
         <DebugMode />
         <RecordingIndicator />
       </RoomContext.Provider>

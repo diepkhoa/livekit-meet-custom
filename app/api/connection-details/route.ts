@@ -75,15 +75,22 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    // 3. NẾU LÀ HỌC SINH (GUEST): KIỂM TRA PHÒNG ĐÃ MỞ CHƯA
+    // 3. NẾU LÀ HỌC SINH (CHƯA ĐĂNG NHẬP): BẮT BUỘC KIỂM TRA PHÒNG ĐÃ TỒN TẠI CHƯA
     if (!isTeacher) {
-      const httpUrl = livekitUrl.replace('wss://', 'https://').replace('ws://', 'http://');
-      const roomService = new RoomServiceClient(httpUrl, apiKey, apiSecret);
+      // Ưu tiên gọi trực tiếp container nội bộ 'http://livekit-server:7880'
+      // Nếu ở localhost thì mới fallback dùng https://meet.diepkhoa.io.vn
+      const livekitHost = process.env.LIVEKIT_INTERNAL_URL ||
+        (process.env.NODE_ENV === 'production'
+          ? 'http://livekit-server:7880'
+          : livekitUrl.replace('wss://', 'https://').replace('ws://', 'http://'));
+
+      const roomService = new RoomServiceClient(livekitHost, apiKey, apiSecret);
 
       try {
         const rooms = await roomService.listRooms([roomName]);
         const roomExists = rooms.some((r) => r.name === roomName);
 
+        // NẾU PHÒNG CHƯA ĐƯỢC TẠO BỞI GIÁO VIÊN -> CHẶN NGAY LẬP TỨC!
         if (!roomExists) {
           return NextResponse.json(
             { error: 'Phòng học này không tồn tại hoặc chưa được giáo viên mở!' },
