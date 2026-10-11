@@ -23,30 +23,14 @@
   color: #f8fafc;
   padding: 24px;
 
-  /* ── ẢNH NỀN KÈM LỚP PHỦ MỜ (OVERLAY) ĐỂ CHỮ KHÔNG BỊ CHÓI ── */
   background:
-    linear-gradient(rgba(9, 13, 22, 0.75), rgba(9, 13, 22, 0.85)),
-    /* Lớp phủ làm dịu ảnh */
-    url('/background-images/ali-kazal-tbw_KQE3Cbg-unsplash.jpg');
-  /* Đường dẫn ảnh trong thư mục public */
+    /*linear-gradient(rgba(9, 13, 22, 0.75), rgba(9, 13, 22, 0.85)),*/
+    url('/background-images/bg.jpg');
+  /* ĐƯỜNG DẪN BẮT ĐẦU BẰNG DẤU GẠCH CHÉO '/' */
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
 }
-
-/* Hiệu ứng ánh sáng nền mềm mại (Ambient Glow) 
-.ambientGlow {
-  position: absolute;
-  top: 30%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 500px;
-  height: 350px;
-  background: radial-gradient(circle, rgba(99, 102, 241, 0.18) 0%, rgba(168, 85, 247, 0.08) 50%, transparent 70%);
-  filter: blur(80px);
-  pointer-events: none;
-  z-index: 0;
-}*/
 
 .container {
   width: 100%;
@@ -72,7 +56,7 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  background: rgba(30, 41, 59, 0.7);
+  background: rgba(124, 164, 238, 0.7);
   border: 1px solid rgba(255, 255, 255, 0.1);
   padding: 6px 14px;
   border-radius: 9999px;

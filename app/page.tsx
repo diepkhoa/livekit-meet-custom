@@ -96,12 +96,7 @@ export default function Home() {
 
       <div className={styles.container}>
         <div className={styles.header}>
-          <div className={styles.badge}>
-            <span className={styles.badgeDot} />
-            <span>Powered by Huongsac Inc.</span>
-          </div>
-          <h1 className={styles.title}>Lớp Học Cô Tuyền</h1>
-
+          <h1 className={styles.title}>Meet You</h1>
         </div>
 
         <div className={styles.card}>
@@ -241,9 +236,8 @@ export default function Home() {
         </div>
 
         <footer className={styles.footer}>
-          <span>Highperformance meeting system</span>
-          <span className={styles.divider}>•</span>
-          <span>Backend by meogon | Frontend by meobi</span>
+          <span>© 2026 Huong Sac. All rights reserved.</span>
+
         </footer>
       </div>
     </main>
