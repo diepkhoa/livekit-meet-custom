@@ -42,22 +42,22 @@ export function CustomControlBar() {
                             // Chọn độ phân giải:
                             // - 1080p: width: 1920, height: 1080
                             // - 2K:    width: 2560, height: 1440
-                            width: 2560,
-                            height: 1440,
+                            width: 1920,
+                            height: 1080,
                             frameRate: 60, // Ép trình duyệt bắt 60 khung hình/giây
                         },
-                        // Bắt buộc để trình duyệt tối ưu mượt mà chuyển động 60fps
-                        contentHint: 'motion',
+                        // Nếu share game/video xem chung: dùng 'motion'
+                        contentHint: 'detail',
                     },
                     // 2. Publish Options (Đẩy bitrate cao lên WebRTC)
                     {
                         screenShareEncoding: {
                             // 10_000_000 (10 Mbps) cho 1080p60 | 14_000_000 (14 Mbps) cho 2K60
-                            maxBitrate: 14_000_000,
+                            maxBitrate: 10_000_000,
                             maxFramerate: 60,
                         },
-                        // Giữ vững 60 FPS khi mạng yếu (sẽ hạ bớt độ phân giải để không giật hình)
-                        degradationPreference: 'maintain-framerate',
+                        // Giữ vững độ phân giải (sẽ hạ fps khi mạng yếu)
+                        degradationPreference: 'maintain-resolution',
                     }
                 );
             }

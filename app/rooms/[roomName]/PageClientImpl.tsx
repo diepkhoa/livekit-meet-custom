@@ -123,15 +123,9 @@ function VideoConferenceComponent(props: {
     singlePeerConnection: boolean;
   };
 }) {
-  const keyProvider = new ExternalE2EEKeyProvider();
-  const { worker, e2eePassphrase } = useSetupE2EE();
-  const e2eeEnabled = !!(e2eePassphrase && worker);
-
-  const [e2eeSetupComplete, setE2eeSetupComplete] = React.useState(false);
-
   // 1. CẤU HÌNH ROOM VÀ SCREEN SHARE (CHỈ KHAI BÁO 1 LẦN DUY NHẤT)
   const roomOptions = React.useMemo((): RoomOptions => {
-    const selectedCodec: VideoCodec = 'vp8'; // H264 hỗ trợ GPU rất tốt khi gánh 60fps
+    const selectedCodec: VideoCodec = 'h264';
 
     const videoCaptureDefaults: VideoCaptureOptions = {
       deviceId: props.userChoices.videoDeviceId ?? undefined,
@@ -143,20 +137,14 @@ function VideoConferenceComponent(props: {
       videoSimulcastLayers: props.options.hq
         ? [VideoPresets.h1080, VideoPresets.h720]
         : [VideoPresets.h540, VideoPresets.h216],
-      red: !e2eeEnabled,
+      red: true, // ✅ Bật RED giúp âm thanh mic cực kỳ mượt mà, không bao giờ bị nghẹt tiếng
       videoCodec: selectedCodec,
-
-      // Layer phụ 720p giúp học sinh mạng yếu vẫn xem được mượt mà, không bị lag đứng hình
       screenShareSimulcastLayers: [],
-
       screenShareEncoding: {
-        // 1080p 60fps: 10 Mbps | 2K 60fps: 14 Mbps
-        maxBitrate: props.options.hq ? 14_000_000 : 10_000_000,
+        maxBitrate: 10_000_000,
         maxFramerate: 60,
       },
-
-      // Giữ vững 60 FPS khi mạng chập chờn (tự hạ nhẹ độ phân giải để giữ độ mượt)
-      degradationPreference: 'maintain-framerate',
+      degradationPreference: 'maintain-resolution',
     };
 
     return {
@@ -167,10 +155,10 @@ function VideoConferenceComponent(props: {
       },
       adaptiveStream: false,
       dynacast: false,
-      e2ee: keyProvider && worker && e2eeEnabled ? { keyProvider, worker } : undefined,
+      e2ee: undefined, // ✅ Tắt hẳn E2EE
       singlePeerConnection: props.options.singlePeerConnection,
     };
-  }, [props.userChoices, props.options.hq, e2eeEnabled]);
+  }, [props.userChoices, props.options.hq, props.options.singlePeerConnection]);
 
   const room = React.useMemo(() => new Room(roomOptions), [roomOptions]);
 
@@ -194,66 +182,41 @@ function VideoConferenceComponent(props: {
   }, []);
 
   // 2. KHÔI PHỤC LẠI: THIẾT LẬP MÃ HÓA ĐẦU CUỐI (E2EE)
-  React.useEffect(() => {
-    if (e2eeEnabled) {
-      keyProvider
-        .setKey(decodePassphrase(e2eePassphrase))
-        .then(() => {
-          room.setE2EEEnabled(true).catch((e) => {
-            if (e instanceof DeviceUnsupportedError) {
-              alert(`Trình duyệt không hỗ trợ mã hoá đầu cuối.`);
-              console.error(e);
-            } else {
-              throw e;
-            }
-          });
-        })
-        .then(() => setE2eeSetupComplete(true));
-    } else {
-      setE2eeSetupComplete(true);
-    }
-  }, [e2eeEnabled, room, e2eePassphrase]);
+
 
   const connectOptions = React.useMemo((): RoomConnectOptions => {
     return {
       autoSubscribe: true,
     };
   }, []);
-
-  // 3. KHÔI PHỤC LẠI: KẾT NỐI VÀO PHÒNG VÀ MỞ CAM / MIC
+  // Xóa bỏ useEffect E2EE cũ, chỉ giữ lại đoạn kết nối phòng này:
   React.useEffect(() => {
     room.on(RoomEvent.Disconnected, handleOnLeave);
-    room.on(RoomEvent.EncryptionError, handleEncryptionError);
     room.on(RoomEvent.MediaDevicesError, handleError);
 
-    if (e2eeSetupComplete) {
-      room
-        .connect(
-          props.connectionDetails.serverUrl,
-          props.connectionDetails.participantToken,
-          connectOptions,
-        )
-        .catch((error) => {
-          handleError(error);
-        });
-      if (props.userChoices.videoEnabled) {
-        room.localParticipant.setCameraEnabled(true).catch((error) => {
-          handleError(error);
-        });
-      }
-      if (props.userChoices.audioEnabled) {
-        room.localParticipant.setMicrophoneEnabled(true).catch((error) => {
-          handleError(error);
-        });
-      }
+    // Vào phòng ngay lập tức:
+    room
+      .connect(
+        props.connectionDetails.serverUrl,
+        props.connectionDetails.participantToken,
+        connectOptions,
+      )
+      .catch((error) => {
+        handleError(error);
+      });
+
+    if (props.userChoices.videoEnabled) {
+      room.localParticipant.setCameraEnabled(true).catch(handleError);
     }
+    if (props.userChoices.audioEnabled) {
+      room.localParticipant.setMicrophoneEnabled(true).catch(handleError);
+    }
+
     return () => {
       room.off(RoomEvent.Disconnected, handleOnLeave);
-      room.off(RoomEvent.EncryptionError, handleEncryptionError);
       room.off(RoomEvent.MediaDevicesError, handleError);
     };
-  }, [e2eeSetupComplete, room, props.connectionDetails, props.userChoices]);
-
+  }, [room, props.connectionDetails, props.userChoices, connectOptions, handleOnLeave, handleError]);
   // 4. ÉP CỜ contentHint='motion' ĐỂ KHÔNG BỊ TRÌNH DUYỆT BÓP FPS XUỐNG 5-15 FPS
   React.useEffect(() => {
     const handleScreenSharePublished = (publication: any) => {
@@ -263,7 +226,7 @@ function VideoConferenceComponent(props: {
       ) {
         const mst = publication.track.mediaStreamTrack as MediaStreamTrack;
         if ('contentHint' in mst) {
-          (mst as any).contentHint = 'motion';
+          (mst as any).contentHint = 'detail';
         }
       }
     };
