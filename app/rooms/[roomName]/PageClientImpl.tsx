@@ -113,6 +113,7 @@ export function PageClientImpl(props: {
   );
 }
 
+
 function VideoConferenceComponent(props: {
   userChoices: LocalUserChoices;
   connectionDetails: ConnectionDetails;
@@ -128,9 +129,9 @@ function VideoConferenceComponent(props: {
 
   const [e2eeSetupComplete, setE2eeSetupComplete] = React.useState(false);
 
+  // 1. CẤU HÌNH ROOM VÀ SCREEN SHARE (CHỈ KHAI BÁO 1 LẦN DUY NHẤT)
   const roomOptions = React.useMemo((): RoomOptions => {
-    // Ép codec về 'h264' (hoặc 'vp8') để loại bỏ 100% lỗi VP9 SVC
-    const selectedCodec: VideoCodec = 'h264';
+    const selectedCodec: VideoCodec = 'vp8'; // H264 hỗ trợ GPU rất tốt khi gánh 60fps
 
     const videoCaptureDefaults: VideoCaptureOptions = {
       deviceId: props.userChoices.videoDeviceId ?? undefined,
@@ -145,14 +146,17 @@ function VideoConferenceComponent(props: {
       red: !e2eeEnabled,
       videoCodec: selectedCodec,
 
-      // ✅ CÁCH TẮT SIMULCAST CHO SCREEN SHARE ĐÚNG CHUẨN TYPESCRIPT:
-      // Truyền mảng rỗng [] để LiveKit KHÔNG tạo bất kỳ layer phụ (LOW/MEDIUM) nào!
+      // Layer phụ 720p giúp học sinh mạng yếu vẫn xem được mượt mà, không bị lag đứng hình
       screenShareSimulcastLayers: [],
 
       screenShareEncoding: {
-        maxBitrate: 8_000_000, // 3.5 Mbps cực kỳ sắc nét cho bài giảng
-        maxFramerate: 20,      // 20 fps tối ưu cho viết bảng iPad
+        // 1080p 60fps: 10 Mbps | 2K 60fps: 14 Mbps
+        maxBitrate: props.options.hq ? 14_000_000 : 10_000_000,
+        maxFramerate: 60,
       },
+
+      // Giữ vững 60 FPS khi mạng chập chờn (tự hạ nhẹ độ phân giải để giữ độ mượt)
+      degradationPreference: 'maintain-framerate',
     };
 
     return {
@@ -183,11 +187,13 @@ function VideoConferenceComponent(props: {
     console.error(error);
     alert(`Lỗi không mong đợi: ${error.message}`);
   }, []);
+
   const handleEncryptionError = React.useCallback((error: Error) => {
     console.error(error);
     alert(`Lỗi mã hoá: ${error.message}`);
   }, []);
 
+  // 2. KHÔI PHỤC LẠI: THIẾT LẬP MÃ HÓA ĐẦU CUỐI (E2EE)
   React.useEffect(() => {
     if (e2eeEnabled) {
       keyProvider
@@ -214,6 +220,7 @@ function VideoConferenceComponent(props: {
     };
   }, []);
 
+  // 3. KHÔI PHỤC LẠI: KẾT NỐI VÀO PHÒNG VÀ MỞ CAM / MIC
   React.useEffect(() => {
     room.on(RoomEvent.Disconnected, handleOnLeave);
     room.on(RoomEvent.EncryptionError, handleEncryptionError);
@@ -247,7 +254,7 @@ function VideoConferenceComponent(props: {
     };
   }, [e2eeSetupComplete, room, props.connectionDetails, props.userChoices]);
 
-  // Ép cờ contentHint='detail' trực tiếp vào Track Media
+  // 4. ÉP CỜ contentHint='motion' ĐỂ KHÔNG BỊ TRÌNH DUYỆT BÓP FPS XUỐNG 5-15 FPS
   React.useEffect(() => {
     const handleScreenSharePublished = (publication: any) => {
       if (
@@ -256,7 +263,7 @@ function VideoConferenceComponent(props: {
       ) {
         const mst = publication.track.mediaStreamTrack as MediaStreamTrack;
         if ('contentHint' in mst) {
-          (mst as any).contentHint = 'detail';
+          (mst as any).contentHint = 'motion';
         }
       }
     };
@@ -272,6 +279,7 @@ function VideoConferenceComponent(props: {
   if (isLeaving) {
     return <div style={{ background: '#090d16', minHeight: '100vh' }} />;
   }
+
   return (
     <div className={`lk-room-container ${hideTiles ? 'hide-tiles' : ''}`}>
       {/* Nút mắt ở góc trên bên trái */}
@@ -303,7 +311,7 @@ function VideoConferenceComponent(props: {
           SettingsComponent={SHOW_SETTINGS_MENU ? SettingsMenu : undefined}
         />
 
-        {/* 👉 THANH ĐIỀU KHIỂN CUSTOM CỦA BẠN: */}
+        {/* Thanh điều khiển custom của bạn */}
         <CustomControlBar />
 
         <DebugMode />

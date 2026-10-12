@@ -8,16 +8,65 @@ export function CustomControlBar() {
     const { localParticipant, isMicrophoneEnabled, isCameraEnabled, isScreenShareEnabled } =
         useLocalParticipant();
 
-    const toggleMic = () => {
-        localParticipant.setMicrophoneEnabled(!isMicrophoneEnabled);
+    const toggleMic = async () => {
+        try {
+            await localParticipant.setMicrophoneEnabled(!isMicrophoneEnabled);
+        } catch (e) {
+            console.error('Lỗi Mic:', e);
+        }
     };
 
-    const toggleCam = () => {
-        localParticipant.setCameraEnabled(!isCameraEnabled);
+    const toggleCam = async () => {
+        try {
+            await localParticipant.setCameraEnabled(!isCameraEnabled);
+        } catch (e) {
+            console.error('Lỗi Camera:', e);
+        }
     };
 
-    const toggleScreen = () => {
-        localParticipant.setScreenShareEnabled(!isScreenShareEnabled);
+    // 👉 ĐÃ TINH CHỈNH ĐỂ ĐẠT 60 FPS VÀ 1080p / 2K TẠI ĐÂY:
+    const toggleScreen = async () => {
+        try {
+            if (isScreenShareEnabled) {
+                // Tắt chia sẻ màn hình
+                await localParticipant.setScreenShareEnabled(false);
+            } else {
+                // Bật chia sẻ màn hình với thông số 60 FPS cao cấp
+                await localParticipant.setScreenShareEnabled(
+                    true,
+                    // 1. Capture Options (Yêu cầu trình duyệt quay màn hình)
+                    {
+                        audio: true, // Cho phép chia sẻ kèm âm thanh hệ thống/tab
+                        selfBrowserSurface: 'include',
+                        resolution: {
+                            // Chọn độ phân giải:
+                            // - 1080p: width: 1920, height: 1080
+                            // - 2K:    width: 2560, height: 1440
+                            width: 2560,
+                            height: 1440,
+                            frameRate: 60, // Ép trình duyệt bắt 60 khung hình/giây
+                        },
+                        // Bắt buộc để trình duyệt tối ưu mượt mà chuyển động 60fps
+                        contentHint: 'motion',
+                    },
+                    // 2. Publish Options (Đẩy bitrate cao lên WebRTC)
+                    {
+                        screenShareEncoding: {
+                            // 10_000_000 (10 Mbps) cho 1080p60 | 14_000_000 (14 Mbps) cho 2K60
+                            maxBitrate: 14_000_000,
+                            maxFramerate: 60,
+                        },
+                        // Giữ vững 60 FPS khi mạng yếu (sẽ hạ bớt độ phân giải để không giật hình)
+                        degradationPreference: 'maintain-framerate',
+                    }
+                );
+            }
+        } catch (error: any) {
+            // Bỏ qua lỗi nếu người dùng bấm "Hủy" (Cancel) ở popup chọn màn hình
+            if (error?.name !== 'NotAllowedError') {
+                console.error('Lỗi khi chia sẻ màn hình:', error);
+            }
+        }
     };
 
     const toggleChat = () => {
@@ -87,7 +136,7 @@ export function CustomControlBar() {
                 type="button"
                 onClick={toggleScreen}
                 className={`custom-btn ${isScreenShareEnabled ? 'sharing' : 'neutral'}`}
-                title={isScreenShareEnabled ? 'Dừng chia sẻ' : 'Chia sẻ màn hình'}
+                title={isScreenShareEnabled ? 'Dừng chia sẻ' : 'Chia sẻ màn hình (60 FPS)'}
             >
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
                     <rect x="2" y="3" width="20" height="14" rx="2" />
