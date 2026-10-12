@@ -47,7 +47,7 @@ export function CustomControlBar() {
                             frameRate: 60, // Ép trình duyệt bắt 60 khung hình/giây
                         },
                         // Nếu share game/video xem chung: dùng 'motion'
-                        contentHint: 'detail',
+                        contentHint: 'motion',
                     },
                     // 2. Publish Options (Đẩy bitrate cao lên WebRTC)
                     {

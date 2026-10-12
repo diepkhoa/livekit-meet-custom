@@ -226,7 +226,7 @@ function VideoConferenceComponent(props: {
       ) {
         const mst = publication.track.mediaStreamTrack as MediaStreamTrack;
         if ('contentHint' in mst) {
-          (mst as any).contentHint = 'detail';
+          (mst as any).contentHint = 'motion';
         }
       }
     };
