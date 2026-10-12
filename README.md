@@ -1,4 +1,4 @@
-# Meet DiepKhoa
+# Meet You
 
 Một phiên bản tùy chỉnh của LiveKit Meet dành cho nhu cầu họp trực tuyến cá nhân và nội bộ dựa trên livekit tích hợp xác thực.
 
