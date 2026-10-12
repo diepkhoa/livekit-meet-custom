@@ -1,42 +1,45 @@
-<a href="https://livekit.io/">
-  <img src="./.github/assets/livekit-mark.png" alt="LiveKit logo" width="100" height="100">
-</a>
+# Meet DiepKhoa
 
-# LiveKit Meet
+Một phiên bản tùy chỉnh của LiveKit Meet dành cho nhu cầu họp trực tuyến cá nhân và nội bộ dựa trên livekit tích hợp xác thực.
 
-<p>
-  <a href="https://meet.livekit.io"><strong>Try the demo</strong></a>
-  •
-  <a href="https://github.com/livekit/components-js">LiveKit Components</a>
-  •
-  <a href="https://docs.livekit.io/">LiveKit Docs</a>
-  •
-  <a href="https://livekit.io/cloud">LiveKit Cloud</a>
-  •
-  <a href="https://blog.livekit.io/">Blog</a>
-</p>
+## Tính năng
 
-<br>
+- Video call chất lượng cao
+- Chia sẻ màn hình
+- Chat trong cuộc họp
+- Đăng nhập bằng Google
+- Giao diện được tùy chỉnh từ LiveKit Meet
 
-LiveKit Meet is an open source video conferencing app built on [LiveKit Components](https://github.com/livekit/components-js), [LiveKit Cloud](https://cloud.livekit.io/), and Next.js. It's been completely redesigned from the ground up using our new components library.
+## Công nghệ
 
-![LiveKit Meet screenshot](./.github/assets/livekit-meet.jpg)
+- Next.js
+- LiveKit
+- Google OAuth
+- Docker
 
-## Tech Stack
+## Chạy local
 
-- This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
-- App is built with [@livekit/components-react](https://github.com/livekit/components-js/) library.
+```bash
+pnpm install
+pnpm dev
+```
 
-## Demo
+Mở:
 
-Give it a try at https://meet.livekit.io.
+```text
+http://localhost:3000
+```
 
-## Dev Setup
+## Triển khai
 
-Steps to get a local dev setup up and running:
+Ứng dụng được triển khai trên hạ tầng cá nhân và sử dụng LiveKit cho thời gian thực.
+Đây chỉ là giao diện và backend đơn giản, bạn cần cài đặt sfu và hạ tầng phía sau.
 
-1. Run `pnpm install` to install all dependencies.
-2. Copy `.env.example` in the project root and rename it to `.env.local`.
-3. Update the missing environment variables in the newly created `.env.local` file.
-4. Run `pnpm dev` to start the development server and visit [http://localhost:3000](http://localhost:3000) to see the result.
-5. Start development 🎉
+## Credits
+
+- LiveKit: https://livekit.io
+- LiveKit Meet: https://github.com/livekit-examples/meet
+
+## License
+
+MIT
