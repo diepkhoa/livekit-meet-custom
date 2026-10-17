@@ -160,7 +160,9 @@ export function CustomControlBar() {
                 </svg>
             </button>
 
-            {/* 5. Nút Rời phòng */}
+
+
+            {/* 6. Nút Rời phòng */}
             <button
                 type="button"
                 onClick={handleLeave}

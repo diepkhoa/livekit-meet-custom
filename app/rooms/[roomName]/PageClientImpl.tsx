@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import { decodePassphrase } from '@/lib/client-utils';
 import { DebugMode } from '@/lib/Debug';
 import { KeyboardShortcuts } from '@/lib/KeyboardShortcuts';
 import { RecordingIndicator } from '@/lib/RecordingIndicator';
@@ -15,12 +14,10 @@ import {
   VideoConference,
 } from '@livekit/components-react';
 import {
-  ExternalE2EEKeyProvider,
   RoomOptions,
   VideoCodec,
   VideoPresets,
   Room,
-  DeviceUnsupportedError,
   RoomConnectOptions,
   RoomEvent,
   Track,
@@ -28,11 +25,10 @@ import {
   VideoCaptureOptions,
 } from 'livekit-client';
 import { useRouter } from 'next/navigation';
-import { useSetupE2EE } from '@/lib/useSetupE2EE';
 import { useLowCPUOptimizer } from '@/lib/usePerfomanceOptimiser';
 import { CustomControlBar } from '@/components/CustomControlBar';
-import { CustomChat } from '@/components/CustomChat';
-
+import { ToggleTilesButton } from '@/components/ToggleTilesButton';
+import { CinemaFullscreenButton } from '@/components/CinemaFullscreenButton';
 
 const CONN_DETAILS_ENDPOINT =
   process.env.NEXT_PUBLIC_CONN_DETAILS_ENDPOINT ?? '/api/connection-details';
@@ -113,7 +109,6 @@ export function PageClientImpl(props: {
   );
 }
 
-
 function VideoConferenceComponent(props: {
   userChoices: LocalUserChoices;
   connectionDetails: ConnectionDetails;
@@ -123,7 +118,7 @@ function VideoConferenceComponent(props: {
     singlePeerConnection: boolean;
   };
 }) {
-  // 1. CẤU HÌNH ROOM VÀ SCREEN SHARE (CHỈ KHAI BÁO 1 LẦN DUY NHẤT)
+  // 1. CẤU HÌNH ROOM VÀ SCREEN SHARE TỐI ƯU
   const roomOptions = React.useMemo((): RoomOptions => {
     const selectedCodec: VideoCodec = 'h264';
 
@@ -137,7 +132,7 @@ function VideoConferenceComponent(props: {
       videoSimulcastLayers: props.options.hq
         ? [VideoPresets.h1080, VideoPresets.h720]
         : [VideoPresets.h540, VideoPresets.h216],
-      red: true, // ✅ Bật RED giúp âm thanh mic cực kỳ mượt mà, không bao giờ bị nghẹt tiếng
+      red: true, // Bật RED giúp âm thanh không bị nghẹt tiếng
       videoCodec: selectedCodec,
       screenShareSimulcastLayers: [],
       screenShareEncoding: {
@@ -155,7 +150,7 @@ function VideoConferenceComponent(props: {
       },
       adaptiveStream: false,
       dynacast: false,
-      e2ee: undefined, // ✅ Tắt hẳn E2EE
+      e2ee: undefined, // Tắt hoàn toàn E2EE để máy mát
       singlePeerConnection: props.options.singlePeerConnection,
     };
   }, [props.userChoices, props.options.hq, props.options.singlePeerConnection]);
@@ -164,7 +159,6 @@ function VideoConferenceComponent(props: {
 
   const router = useRouter();
   const [isLeaving, setIsLeaving] = React.useState(false);
-  const [isChatOpen, setIsChatOpen] = React.useState(false);
 
   const handleOnLeave = React.useCallback(() => {
     setIsLeaving(true);
@@ -176,34 +170,24 @@ function VideoConferenceComponent(props: {
     alert(`Lỗi không mong đợi: ${error.message}`);
   }, []);
 
-  const handleEncryptionError = React.useCallback((error: Error) => {
-    console.error(error);
-    alert(`Lỗi mã hoá: ${error.message}`);
-  }, []);
-
-  // 2. KHÔI PHỤC LẠI: THIẾT LẬP MÃ HÓA ĐẦU CUỐI (E2EE)
-
-
   const connectOptions = React.useMemo((): RoomConnectOptions => {
     return {
       autoSubscribe: true,
     };
   }, []);
-  // Xóa bỏ useEffect E2EE cũ, chỉ giữ lại đoạn kết nối phòng này:
+
+  // 2. KẾT NỐI VÀO PHÒNG TRỰC TIẾP
   React.useEffect(() => {
     room.on(RoomEvent.Disconnected, handleOnLeave);
     room.on(RoomEvent.MediaDevicesError, handleError);
 
-    // Vào phòng ngay lập tức:
     room
       .connect(
         props.connectionDetails.serverUrl,
         props.connectionDetails.participantToken,
         connectOptions,
       )
-      .catch((error) => {
-        handleError(error);
-      });
+      .catch(handleError);
 
     if (props.userChoices.videoEnabled) {
       room.localParticipant.setCameraEnabled(true).catch(handleError);
@@ -217,7 +201,8 @@ function VideoConferenceComponent(props: {
       room.off(RoomEvent.MediaDevicesError, handleError);
     };
   }, [room, props.connectionDetails, props.userChoices, connectOptions, handleOnLeave, handleError]);
-  // 4. ÉP CỜ contentHint='motion' ĐỂ KHÔNG BỊ TRÌNH DUYỆT BÓP FPS XUỐNG 5-15 FPS
+
+  // 3. ÉP CỜ contentHint='motion' ĐỂ GIỮ VỮNG 60 FPS
   React.useEffect(() => {
     const handleScreenSharePublished = (publication: any) => {
       if (
@@ -239,33 +224,50 @@ function VideoConferenceComponent(props: {
   const lowPowerMode = useLowCPUOptimizer(room);
   const [hideTiles, setHideTiles] = React.useState(false);
 
+  // 4. CƠ CHẾ AUTO-HIDE (Hiện nút khi chạm/rê chuột, tự mờ sau 3 giây)
+  const [showOverlayControls, setShowOverlayControls] = React.useState(false);
+  const hideTimerRef = React.useRef<NodeJS.Timeout | null>(null);
+
+  const handleUserActivity = React.useCallback(() => {
+    setShowOverlayControls(true);
+    if (hideTimerRef.current) {
+      clearTimeout(hideTimerRef.current);
+    }
+    // Tự động mờ đi sau 3 giây không chạm
+    hideTimerRef.current = setTimeout(() => {
+      setShowOverlayControls(false);
+    }, 3000);
+  }, []);
+
+  React.useEffect(() => {
+    window.addEventListener('mousemove', handleUserActivity);
+    window.addEventListener('touchstart', handleUserActivity);
+    return () => {
+      window.removeEventListener('mousemove', handleUserActivity);
+      window.removeEventListener('touchstart', handleUserActivity);
+      if (hideTimerRef.current) clearTimeout(hideTimerRef.current);
+    };
+  }, [handleUserActivity]);
+
   if (isLeaving) {
     return <div style={{ background: '#090d16', minHeight: '100vh' }} />;
   }
 
   return (
-    <div className={`lk-room-container ${hideTiles ? 'hide-tiles' : ''}`}>
-      {/* Nút mắt ở góc trên bên trái */}
-      <button
-        type="button"
-        onClick={() => setHideTiles(!hideTiles)}
-        className="lk-toggle-tiles-btn"
-        title={hideTiles ? 'Hiện camera thành viên' : 'Ẩn camera thành viên'}
-      >
-        {hideTiles ? (
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-            <path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0" />
-            <circle cx="12" cy="12" r="3" />
-          </svg>
-        ) : (
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-            <path d="M10.733 5.076a10.744 10.744 0 0 1 11.205 6.575 1 1 0 0 1 0 .696 10.747 10.747 0 0 1-1.444 2.49" />
-            <path d="M14.084 14.158a3 3 0 0 1-4.242-4.242" />
-            <path d="M17.479 17.499a10.75 10.75 0 0 1-15.417-5.151 1 1 0 0 1 0-.696 10.75 10.75 0 0 1 4.446-5.143" />
-            <path d="m2 2 20 20" />
-          </svg>
-        )}
-      </button>
+    <div
+      // Thêm class controls-visible / controls-hidden vào đây:
+      className={`lk-room-container ${hideTiles ? 'hide-tiles' : ''} ${showOverlayControls ? 'controls-visible' : 'controls-hidden'
+        }`}
+      onClick={handleUserActivity}
+    >
+      {/* 👉 THANH TIỆN ÍCH TRÊN ĐỈNH (Tự ẩn/hiện, đồng bộ 100% style): */}
+      <div className={`video-top-overlay-bar ${showOverlayControls ? 'visible' : 'hidden'}`}>
+        <ToggleTilesButton
+          hideTiles={hideTiles}
+          onToggle={() => setHideTiles((prev) => !prev)}
+        />
+        <CinemaFullscreenButton />
+      </div>
 
       <RoomContext.Provider value={room}>
         <KeyboardShortcuts />
@@ -274,7 +276,6 @@ function VideoConferenceComponent(props: {
           SettingsComponent={SHOW_SETTINGS_MENU ? SettingsMenu : undefined}
         />
 
-        {/* Thanh điều khiển custom của bạn */}
         <CustomControlBar />
 
         <DebugMode />
