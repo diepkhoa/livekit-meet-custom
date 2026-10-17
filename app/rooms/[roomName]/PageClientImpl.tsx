@@ -179,6 +179,10 @@ function VideoConferenceComponent(props: {
     setIsChatOpen(false);
   }, []);
 
+  const handleNewMessage = React.useCallback(() => {
+    setUnreadCount((prev) => prev + 1);
+  }, []);
+
   const handleOnLeave = React.useCallback(() => {
     setIsLeaving(true);
     router.push('/');
@@ -298,7 +302,7 @@ function VideoConferenceComponent(props: {
         <CustomChat
           isChatOpen={isChatOpen}
           onClose={handleCloseChat}
-          onNewMessage={() => setUnreadCount((prev) => prev + 1)}
+          onNewMessage={handleNewMessage}
         />
 
         {/* 👉 3. THANH ĐIỀU KHIỂN NHẬN UNREAD COUNT: */}
