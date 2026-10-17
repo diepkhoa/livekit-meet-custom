@@ -1,21 +1,53 @@
+// components/CustomChat.tsx
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
 import { useChat } from '@livekit/components-react';
 
 interface CustomChatProps {
+    isChatOpen: boolean;
     onClose: () => void;
+    onNewMessage?: () => void;
 }
 
-export function CustomChat({ onClose }: CustomChatProps) {
+export function CustomChat({ isChatOpen, onClose, onNewMessage }: CustomChatProps) {
     const { chatMessages, send, isSending } = useChat();
     const [messageText, setMessageText] = useState('');
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
+    // 👉 DÙNG REF ĐỂ LƯU ID TIN NHẮN ĐÃ XỬ LÝ (CHỐNG TRÀN VÒNG LẶP):
+    const lastProcessedIdRef = useRef<string | null>(null);
+    const onNewMessageRef = useRef(onNewMessage);
+    onNewMessageRef.current = onNewMessage;
+
     // Tự động cuộn xuống tin nhắn mới nhất
     useEffect(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }, [chatMessages]);
+        if (isChatOpen) {
+            messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+        }
+    }, [chatMessages, isChatOpen]);
+
+    // 👉 BẮT TIN NHẮN MỚI CHUẨN XÁC: CHỈ ĐẾM ĐÚNG 1 LẦN DUY NHẤT CHO MỖI TIN NHẮN
+    useEffect(() => {
+        if (chatMessages.length === 0) return;
+        const latestMsg = chatMessages[chatMessages.length - 1];
+        const msgId = latestMsg.id || `${latestMsg.timestamp}`;
+
+        // Nếu đang mở chat -> Coi như đã đọc tin nhắn mới nhất
+        if (isChatOpen) {
+            lastProcessedIdRef.current = msgId;
+            return;
+        }
+
+        // Nếu chat đang ĐÓNG và tin nhắn này CHƯA TỪNG ĐƯỢC ĐẾM:
+        if (lastProcessedIdRef.current !== msgId) {
+            lastProcessedIdRef.current = msgId;
+            // Chỉ thông báo nếu là tin nhắn do người khác gửi
+            if (!latestMsg.from?.isLocal) {
+                onNewMessageRef.current?.();
+            }
+        }
+    }, [chatMessages, isChatOpen]);
 
     const handleSend = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -26,8 +58,7 @@ export function CustomChat({ onClose }: CustomChatProps) {
     };
 
     return (
-        <aside className="custom-chat-panel">
-            {/* ── HEADER KHUNG CHAT VỚI NÚT X TRÒN TINH TẾ ── */}
+        <aside className={`custom-chat-panel ${isChatOpen ? 'is-open' : 'is-closed'}`}>
             <div className="custom-chat-header">
                 <div className="chat-title">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
@@ -36,7 +67,6 @@ export function CustomChat({ onClose }: CustomChatProps) {
                     <span>Tin nhắn trong lớp</span>
                 </div>
 
-                {/* NÚT X ĐÓNG CHAT CHUẨN DESIGN */}
                 <button type="button" onClick={onClose} className="chat-close-btn" title="Đóng chat">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
                         <line x1="18" y1="6" x2="6" y2="18" />
@@ -45,17 +75,18 @@ export function CustomChat({ onClose }: CustomChatProps) {
                 </button>
             </div>
 
-            {/* ── DANH SÁCH TIN NHẮN (MESSAGE BUBBLES) ── */}
             <div className="custom-chat-messages">
                 {chatMessages.length === 0 ? (
                     <div className="chat-empty">Chưa có tin nhắn nào trong lớp học.</div>
                 ) : (
-                    chatMessages.map((msg) => {
-                        const isMe = msg.from?.isLocal;
+                    chatMessages.map((msg, index) => {
+                        const isMe = Boolean(msg.from?.isLocal);
+                        const senderName = msg.from?.name || msg.from?.identity || 'Thành viên';
+
                         return (
-                            <div key={msg.id} className={`chat-message ${isMe ? 'msg-me' : 'msg-other'}`}>
+                            <div key={msg.id || `${msg.timestamp}-${index}`} className={`chat-message ${isMe ? 'msg-me' : 'msg-other'}`}>
                                 <div className="msg-header">
-                                    <span className="msg-sender">{msg.from?.name || msg.from?.identity}</span>
+                                    <span className="msg-sender">{senderName}</span>
                                     <span className="msg-time">
                                         {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                     </span>
@@ -68,7 +99,6 @@ export function CustomChat({ onClose }: CustomChatProps) {
                 <div ref={messagesEndRef} />
             </div>
 
-            {/* ── FORM GỬI TIN NHẮN VỚI NÚT SEND MÁY BAY GIẤY ── */}
             <form onSubmit={handleSend} className="custom-chat-form">
                 <input
                     type="text"

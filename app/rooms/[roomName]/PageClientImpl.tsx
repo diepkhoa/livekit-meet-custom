@@ -29,6 +29,7 @@ import { useLowCPUOptimizer } from '@/lib/usePerfomanceOptimiser';
 import { CustomControlBar } from '@/components/CustomControlBar';
 import { ToggleTilesButton } from '@/components/ToggleTilesButton';
 import { CinemaFullscreenButton } from '@/components/CinemaFullscreenButton';
+import { CustomChat } from '@/components/CustomChat';
 
 const CONN_DETAILS_ENDPOINT =
   process.env.NEXT_PUBLIC_CONN_DETAILS_ENDPOINT ?? '/api/connection-details';
@@ -160,6 +161,24 @@ function VideoConferenceComponent(props: {
   const router = useRouter();
   const [isLeaving, setIsLeaving] = React.useState(false);
 
+  // 👉 ĐÃ BỔ SUNG STATE QUẢN LÝ ĐÓNG/MỞ CHAT Ở ĐÂY:
+  const [isChatOpen, setIsChatOpen] = React.useState(false);
+  const [unreadCount, setUnreadCount] = React.useState(0);
+
+  const handleToggleChat = React.useCallback(() => {
+    setIsChatOpen((prev) => {
+      // Khi mở chat ra -> Xóa ngay huy hiệu thông báo
+      if (!prev) {
+        setUnreadCount(0);
+      }
+      return !prev;
+    });
+  }, []);
+
+  const handleCloseChat = React.useCallback(() => {
+    setIsChatOpen(false);
+  }, []);
+
   const handleOnLeave = React.useCallback(() => {
     setIsLeaving(true);
     router.push('/');
@@ -255,18 +274,17 @@ function VideoConferenceComponent(props: {
 
   return (
     <div
-      // Thêm class controls-visible / controls-hidden vào đây:
       className={`lk-room-container ${hideTiles ? 'hide-tiles' : ''} ${showOverlayControls ? 'controls-visible' : 'controls-hidden'
         }`}
       onClick={handleUserActivity}
     >
-      {/* 👉 THANH TIỆN ÍCH TRÊN ĐỈNH (Tự ẩn/hiện, đồng bộ 100% style): */}
+      {/* 👉 THANH NÚT TRÊN ĐỈNH: Khi mở chat thì tự động ẩn nút Fullscreen để không bị chèn */}
       <div className={`video-top-overlay-bar ${showOverlayControls ? 'visible' : 'hidden'}`}>
         <ToggleTilesButton
           hideTiles={hideTiles}
           onToggle={() => setHideTiles((prev) => !prev)}
         />
-        <CinemaFullscreenButton />
+        {!isChatOpen && <CinemaFullscreenButton />}
       </div>
 
       <RoomContext.Provider value={room}>
@@ -276,7 +294,19 @@ function VideoConferenceComponent(props: {
           SettingsComponent={SHOW_SETTINGS_MENU ? SettingsMenu : undefined}
         />
 
-        <CustomControlBar />
+        {/* 👉 2. KHUNG CHAT LUÔN ĐƯỢC MOUNT (Ẩn/hiện qua isChatOpen): */}
+        <CustomChat
+          isChatOpen={isChatOpen}
+          onClose={handleCloseChat}
+          onNewMessage={() => setUnreadCount((prev) => prev + 1)}
+        />
+
+        {/* 👉 3. THANH ĐIỀU KHIỂN NHẬN UNREAD COUNT: */}
+        <CustomControlBar
+          isChatOpen={isChatOpen}
+          onToggleChat={handleToggleChat}
+          unreadCount={unreadCount}
+        />
 
         <DebugMode />
         <RecordingIndicator />

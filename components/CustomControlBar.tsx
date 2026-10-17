@@ -3,7 +3,14 @@
 import React from 'react';
 import { useLocalParticipant, useRoomContext } from '@livekit/components-react';
 
-export function CustomControlBar() {
+// 👉 KHAI BÁO INTERFACE NHẬN PROPS TỪ COMPONENT CHA:
+interface CustomControlBarProps {
+    isChatOpen?: boolean;
+    onToggleChat?: () => void;
+    unreadCount?: number; // 👉 Thêm số lượng tin nhắn chưa đọc
+}
+
+export function CustomControlBar({ isChatOpen = false, onToggleChat, unreadCount = 0 }: CustomControlBarProps) {
     const room = useRoomContext();
     const { localParticipant, isMicrophoneEnabled, isCameraEnabled, isScreenShareEnabled } =
         useLocalParticipant();
@@ -24,55 +31,36 @@ export function CustomControlBar() {
         }
     };
 
-    // 👉 ĐÃ TINH CHỈNH ĐỂ ĐẠT 60 FPS VÀ 1080p / 2K TẠI ĐÂY:
     const toggleScreen = async () => {
         try {
             if (isScreenShareEnabled) {
-                // Tắt chia sẻ màn hình
                 await localParticipant.setScreenShareEnabled(false);
             } else {
-                // Bật chia sẻ màn hình với thông số 60 FPS cao cấp
                 await localParticipant.setScreenShareEnabled(
                     true,
-                    // 1. Capture Options (Yêu cầu trình duyệt quay màn hình)
                     {
-                        audio: true, // Cho phép chia sẻ kèm âm thanh hệ thống/tab
+                        audio: true,
                         selfBrowserSurface: 'include',
                         resolution: {
-                            // Chọn độ phân giải:
-                            // - 1080p: width: 1920, height: 1080
-                            // - 2K:    width: 2560, height: 1440
                             width: 1920,
                             height: 1080,
-                            frameRate: 60, // Ép trình duyệt bắt 60 khung hình/giây
+                            frameRate: 60,
                         },
-                        // Nếu share game/video xem chung: dùng 'motion'
                         contentHint: 'motion',
                     },
-                    // 2. Publish Options (Đẩy bitrate cao lên WebRTC)
                     {
                         screenShareEncoding: {
-                            // 10_000_000 (10 Mbps) cho 1080p60 | 14_000_000 (14 Mbps) cho 2K60
                             maxBitrate: 10_000_000,
                             maxFramerate: 60,
                         },
-                        // Giữ vững độ phân giải (sẽ hạ fps khi mạng yếu)
                         degradationPreference: 'maintain-resolution',
                     }
                 );
             }
         } catch (error: any) {
-            // Bỏ qua lỗi nếu người dùng bấm "Hủy" (Cancel) ở popup chọn màn hình
             if (error?.name !== 'NotAllowedError') {
-                console.error('Lỗi khi chia sẻ màn hình:', error);
+                console.error('Lỗi chia sẻ màn hình:', error);
             }
-        }
-    };
-
-    const toggleChat = () => {
-        const chatBtn = document.querySelector('.lk-chat-toggle') as HTMLButtonElement;
-        if (chatBtn) {
-            chatBtn.click();
         }
     };
 
@@ -89,7 +77,7 @@ export function CustomControlBar() {
             <button
                 type="button"
                 onClick={toggleMic}
-                className={`custom-btn ${isMicrophoneEnabled ? 'active' : 'muted'}`}
+                className={`custom-btn ${isMicrophoneEnabled ? 'neutral' : 'muted'}`}
                 title={isMicrophoneEnabled ? 'Tắt Micro' : 'Bật Micro'}
             >
                 {isMicrophoneEnabled ? (
@@ -114,7 +102,7 @@ export function CustomControlBar() {
             <button
                 type="button"
                 onClick={toggleCam}
-                className={`custom-btn ${isCameraEnabled ? 'active' : 'muted'}`}
+                className={`custom-btn ${isCameraEnabled ? 'neutral' : 'muted'}`}
                 title={isCameraEnabled ? 'Tắt Camera' : 'Bật Camera'}
             >
                 {isCameraEnabled ? (
@@ -148,21 +136,27 @@ export function CustomControlBar() {
                 </svg>
             </button>
 
-            {/* 4. Nút Chat */}
+            {/* 👉 4. NÚT CHAT: Có đèn đỏ báo số tin nhắn chưa đọc */}
             <button
                 type="button"
-                onClick={toggleChat}
-                className="custom-btn neutral"
-                title="Trò chuyện"
+                onClick={onToggleChat}
+                className={`custom-btn ${isChatOpen ? 'active' : 'neutral'}`}
+                title={isChatOpen ? 'Đóng trò chuyện' : 'Mở trò chuyện'}
+                style={{ position: 'relative' }} // Để neo vị trí huy hiệu đỏ
             >
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
                     <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
                 </svg>
+
+                {/* HUY HIỆU ĐỎ NHẤP NHÁY BÁO TIN NHẮN CHƯA ĐỌC: */}
+                {unreadCount > 0 && !isChatOpen && (
+                    <span className="chat-unread-badge">
+                        {unreadCount > 9 ? '9+' : unreadCount}
+                    </span>
+                )}
             </button>
 
-
-
-            {/* 6. Nút Rời phòng */}
+            {/* 5. Nút Rời phòng */}
             <button
                 type="button"
                 onClick={handleLeave}

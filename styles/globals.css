@@ -732,3 +732,227 @@ aside.lk-carousel,
   /* Đổ bóng gọn nhẹ, sắc nét (không bị nhòe đen thui ra ngoài) */
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
 }
+
+/* ========================================================
+   1. ẨN VĨNH VIỄN KHUNG CHAT CŨ CỦA LIVEKIT
+======================================================== */
+.lk-chat {
+  display: none !important;
+}
+
+/* ========================================================
+   2. KHUNG CHAT CUSTOM (.custom-chat-panel)
+======================================================== */
+.custom-chat-panel {
+  position: absolute !important;
+  top: 14px !important;
+  right: 14px !important;
+  bottom: 84px !important;
+  /* Dừng phía trên thanh công cụ đáy */
+  width: 320px !important;
+  max-width: calc(100% - 28px) !important;
+  background: rgba(15, 23, 42, 0.95) !important;
+  backdrop-filter: blur(24px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: 18px !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.85) !important;
+  z-index: 150 !important;
+  /* Nổi bật lên trên mọi thành phần */
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+}
+
+/* Header & Nút X tròn tinh tế */
+.custom-chat-header {
+  padding: 12px 16px !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  color: #f8fafc !important;
+}
+
+.chat-title {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  font-weight: 600 !important;
+  font-size: 14px !important;
+}
+
+.chat-close-btn {
+  width: 30px !important;
+  height: 30px !important;
+  border-radius: 50% !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: #94a3b8 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+}
+
+.chat-close-btn:hover {
+  background: rgba(239, 68, 68, 0.2) !important;
+  border-color: rgba(239, 68, 68, 0.4) !important;
+  color: #f87171 !important;
+  transform: scale(1.08) !important;
+}
+
+/* Danh sách tin nhắn */
+.custom-chat-messages {
+  flex: 1 !important;
+  overflow-y: auto !important;
+  padding: 14px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 10px !important;
+}
+
+.chat-empty {
+  text-align: center !important;
+  color: #64748b !important;
+  font-size: 13px !important;
+  margin-top: 40px !important;
+}
+
+/* Từng dòng tin nhắn */
+.chat-message {
+  display: flex !important;
+  flex-direction: column !important;
+  max-width: 82% !important;
+}
+
+/* Tin nhắn của mình (Bên phải, màu tím Indigo) */
+.chat-message.msg-me {
+  align-self: flex-end !important;
+  align-items: flex-end !important;
+}
+
+.chat-message.msg-me .msg-bubble {
+  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%) !important;
+  color: #ffffff !important;
+  border-radius: 14px 14px 2px 14px !important;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25) !important;
+}
+
+/* Tin nhắn của người khác (Bên trái, màu xám Slate kính mờ) */
+.chat-message.msg-other {
+  align-self: flex-start !important;
+  align-items: flex-start !important;
+}
+
+.chat-message.msg-other .msg-bubble {
+  background: rgba(30, 41, 59, 0.8) !important;
+  color: #f8fafc !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 14px 14px 14px 2px !important;
+}
+
+.msg-header {
+  font-size: 11px !important;
+  color: #94a3b8 !important;
+  margin-bottom: 3px !important;
+  display: flex !important;
+  gap: 6px !important;
+}
+
+.msg-bubble {
+  padding: 8px 12px !important;
+  font-size: 13px !important;
+  line-height: 1.4 !important;
+  word-break: break-word !important;
+}
+
+/* Form nhập tin nhắn & nút máy bay gửi */
+.custom-chat-form {
+  padding: 12px !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+  background: rgba(15, 23, 42, 0.6) !important;
+  display: flex !important;
+  gap: 8px !important;
+  align-items: center !important;
+}
+
+.chat-input {
+  flex: 1 !important;
+  background: rgba(30, 41, 59, 0.7) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: 10px !important;
+  padding: 9px 14px !important;
+  font-size: 13px !important;
+  color: #ffffff !important;
+  outline: none !important;
+}
+
+.chat-input:focus {
+  border-color: #6366f1 !important;
+}
+
+/* NÚT SEND MÁY BAY GIẤY */
+.chat-send-btn {
+  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%) !important;
+  border: none !important;
+  border-radius: 10px !important;
+  color: #ffffff !important;
+  width: 38px !important;
+  height: 38px !important;
+  min-width: 38px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.35) !important;
+  padding: 0 !important;
+}
+
+.chat-send-btn:hover {
+  transform: translateY(-1px) scale(1.05) !important;
+}
+
+.chat-send-btn:disabled {
+  opacity: 0.4 !important;
+  cursor: not-allowed !important;
+  transform: none !important;
+}
+
+/* ========================================================
+   1. ẨN/HIỆN KHUNG CHAT MÀ KHÔNG HỦY COMPONENT
+======================================================== */
+.custom-chat-panel.is-closed {
+  display: none !important;
+}
+
+.custom-chat-panel.is-open {
+  display: flex !important;
+}
+
+/* ========================================================
+   HUY HIỆU ĐỎ TĨNH BÁO TIN NHẮN (KHÔNG NHẤP NHÁY)
+======================================================== */
+.chat-unread-badge {
+  position: absolute !important;
+  top: -2px !important;
+  right: -2px !important;
+  min-width: 18px !important;
+  height: 18px !important;
+  padding: 0 4px !important;
+  border-radius: 9999px !important;
+  background: #ef4444 !important;
+  /* Màu đỏ nổi bật */
+  color: #ffffff !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border: 2px solid #0f172a !important;
+  /* Viền tiệp màu với nút điều khiển */
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4) !important;
+  /* ❌ ĐÃ XÓA HOÀN TOÀN HIỆU ỨNG ANIMATION NHẤP NHÁY */
+}
