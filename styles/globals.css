@@ -258,21 +258,24 @@ aside.lk-carousel,
 }
 
 /* =====================================================================
-   4. LOGIC HIỆN TÊN/MIC (CHỈ HIỆN KHI CHẠM ĐÚNG Ô ĐÓ)
+   4. PHÂN TÁCH ĐỘC LẬP: CHỈ HIỆN TÊN/MIC KHI BẤM ĐÚNG VÀO Ô WEBCAM ĐÓ
    ===================================================================== */
-/* Mặc định: Ẩn tuyệt đối tên và mic của các ô webcam nhỏ */
+
+/* ── A. ĐỐI VỚI CÁC Ô WEBCAM NHỎ CỦA BẠN BÈ (.lk-carousel) ── */
+
+/* 1. Mặc định: Ẩn tuyệt đối 100% tên và micro của tất cả các ô webcam */
 .lk-carousel .lk-participant-metadata {
+  position: absolute !important;
+  left: 4px !important;
+  bottom: 4px !important;
   opacity: 0 !important;
   visibility: hidden !important;
   pointer-events: none !important;
   transform: translateY(4px) !important;
   transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s ease !important;
-  left: 4px !important;
-  bottom: 4px !important;
-  position: absolute !important;
 }
 
-/* CHỈ HIỆN KHI CHẠM HOẶC RÊ CHUỘT VÀO ĐÚNG Ô ĐÓ: */
+/* 2. CHỈ KHI NÀO BẤM HOẶC RÊ CHUỘT VÀO ĐÚNG Ô CỦA AI -> DUY NHẤT Ô ĐÓ MỚI HIỆN: */
 .lk-carousel .lk-participant-tile:hover .lk-participant-metadata,
 .lk-carousel .lk-participant-tile:active .lk-participant-metadata,
 .lk-carousel .lk-participant-tile:focus-within .lk-participant-metadata {
@@ -282,34 +285,29 @@ aside.lk-carousel,
   transform: translateY(0) !important;
 }
 
-/* Ngăn cản sự kiện chạm màn hình phim (controls-visible) làm hiện tên webcam */
-.lk-room-container.controls-visible .lk-carousel .lk-participant-metadata {
+/* 3. KHÓA CHẶT: Dù có chạm vào màn hình phim (controls-visible) thì webcam VẪN PHẢI ẨN TÊN */
+.lk-room-container.controls-visible .lk-carousel .lk-participant-tile:not(:hover):not(:active):not(:focus-within) .lk-participant-metadata {
   opacity: 0 !important;
   visibility: hidden !important;
   pointer-events: none !important;
 }
 
-.lk-room-container.controls-visible .lk-carousel .lk-participant-tile:hover .lk-participant-metadata,
-.lk-room-container.controls-visible .lk-carousel .lk-participant-tile:active .lk-participant-metadata {
-  opacity: 1 !important;
-  visibility: visible !important;
-  pointer-events: auto !important;
-}
-
-/* Định dạng thẻ tên nhỏ gọn */
-.lk-participant-metadata-item {
-  background: rgba(15, 23, 42, 0.85) !important;
-  backdrop-filter: blur(12px) !important;
-  -webkit-backdrop-filter: blur(12px) !important;
-  border: 1px solid rgba(255, 255, 255, 0.15) !important;
-  border-radius: 6px !important;
+/* Định dạng thẻ tên nhỏ xinh trong góc ô webcam */
+.lk-carousel .lk-participant-metadata-item {
+  background: rgba(15, 23, 42, 0.9) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  border-radius: 4px !important;
   padding: 2px 6px !important;
   color: #f8fafc !important;
   font-size: 10px !important;
   font-weight: 500 !important;
 }
 
-/* Bảng tên phim ("Khoa Diệp's screen") tự ẩn sau 3 giây */
+
+/* ── B. ĐỐI VỚI BẢNG TÊN MÀN HÌNH CHIẾU PHIM ("Khoa Diệp's screen") ── */
+
 .lk-focus-layout .lk-participant-metadata {
   position: absolute !important;
   left: 14px !important;
@@ -317,6 +315,7 @@ aside.lk-carousel,
   transition: opacity 0.35s ease, transform 0.35s ease !important;
 }
 
+/* Khi đang xem phim (sau 3s không chạm): Ẩn bảng tên phim */
 .lk-room-container.controls-hidden .lk-focus-layout .lk-participant-metadata {
   opacity: 0 !important;
   visibility: hidden !important;
@@ -324,6 +323,7 @@ aside.lk-carousel,
   pointer-events: none !important;
 }
 
+/* Khi chạm vào màn hình phim: CHỈ hiện lại bảng tên phim này thôi */
 .lk-room-container.controls-visible .lk-focus-layout .lk-participant-metadata {
   opacity: 1 !important;
   visibility: visible !important;
@@ -331,6 +331,7 @@ aside.lk-carousel,
   pointer-events: auto !important;
 }
 
+/* Ẩn các icon rác/cột sóng phụ */
 .lk-participant-metadata-item:not(:first-child),
 .lk-connection-quality {
   display: none !important;
