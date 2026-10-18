@@ -15,18 +15,16 @@ const nunito = Nunito({
 export const metadata: Metadata = {
   title: {
     default: 'Nice to meet you',
-    template: '%s | Lớp Học Cô Tuyền',
+    template: '%s | Lời chào từ đội ngũ của chúng tôi',
   },
   description:
-    'Không gian học tập & chia sẻ bài giảng trực tuyến thời gian thực - Lớp Học Cô Tuyền.',
+    'Không gian họp trực tuyến hiệu suất cao, bảo mật, ổn định.',
   twitter: {
-    creator: '@lophocotuyen',
-    site: '@lophocotuyen',
     card: 'summary_large_image',
   },
   openGraph: {
     url: '/',
-    siteName: 'Lớp Học Cô Tuyền',
+    siteName: 'Huong Sac online meeting',
   },
   icons: {
     icon: {

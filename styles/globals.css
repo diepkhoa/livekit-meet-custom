@@ -1,5 +1,5 @@
 /* =====================================================================
-   LỚP HỌC CÔ TUYỀN – DESIGN SYSTEM CHUẨN HOÁ (CLEAN & MINIMALIST)
+   LỚP HỌC CÔ TUYỀN – DESIGN SYSTEM CHUẨN HOÁ (TỐI GIẢN & SIÊU GỌN)
    (Phong cách Dark Slate Glassmorphism: Linear / Apple / Vercel)
    ===================================================================== */
 
@@ -165,7 +165,7 @@ body {
 }
 
 /* =====================================================================
-   3. PHÒNG HỌC & BỐ CỤC KHUNG HÌNH (ROOM & LAYOUT)
+   3. BỐ CỤC PHÒNG & KHUNG CAMERA (ĐÃ XÓA 100% VẾT MỜ)
    ===================================================================== */
 .lk-room-container {
   width: 100vw !important;
@@ -184,7 +184,7 @@ body {
   background: transparent !important;
 }
 
-/* Khung chiếu phim/bài giảng luôn chiếm trọn diện tích trung tâm */
+/* Khung chiếu phim luôn chiếm trọn diện tích trung tâm */
 .lk-focus-layout {
   position: relative !important;
   width: 100% !important;
@@ -200,6 +200,7 @@ body {
   max-width: 100% !important;
 }
 
+/* Xóa sạch nền và viền của hộp cha chứa camera */
 .lk-carousel,
 aside.lk-carousel,
 [data-lk-theme] .lk-carousel,
@@ -214,7 +215,6 @@ aside.lk-carousel,
   gap: 10px !important;
   width: auto !important;
   height: auto !important;
-  /* Xóa sạch nền, viền và bóng của khung to */
   background: transparent !important;
   background-color: transparent !important;
   border: none !important;
@@ -225,31 +225,40 @@ aside.lk-carousel,
   margin: 0 !important;
 }
 
-/* Xóa vệt gradient che mép của LiveKit */
 .lk-carousel::before,
 .lk-carousel::after {
   display: none !important;
 }
 
-/* =====================================================================
-   2. TỪNG Ô WEBCAM: SẮC NÉT, XÓA HOÀN TOÀN QUẦNG MỜ (BOX-SHADOW)
-   ===================================================================== */
+/* Từng ô webcam: Sắc nét, viền kính 1px, KHÔNG ĐỔ BÓNG NHÒE */
 .lk-carousel .lk-participant-tile {
   width: 96px !important;
   height: 60px !important;
   border-radius: 10px !important;
   overflow: hidden !important;
   background: #0f172a !important;
-  /* Nền xanh đen đặc, không dùng blur để tránh nhòe mép */
   border: 1px solid rgba(255, 255, 255, 0.15) !important;
-  /* Viền kính 1px sắc nét */
   box-shadow: none !important;
-  /* 🔥 BỎ HOÀN TOÀN BOX-SHADOW -> HẾT VẾT MỜ 100% */
+  /* 🔥 ĐÃ TRIỆT TIÊU TOÀN BỘ VẾT MỜ */
   margin: 0 !important;
 }
 
+/* Ẩn camera thành viên khi bật nút con mắt */
+.lk-room-container.hide-tiles .lk-carousel,
+.hide-tiles .lk-carousel {
+  display: none !important;
+}
+
+/* Ẩn vĩnh viễn nút ghim LiveKit thừa */
+.lk-participant-tile button,
+.lk-focus-toggle-button,
+.lk-focus-toggle,
+[class*="focus-toggle"] {
+  display: none !important;
+}
+
 /* =====================================================================
-   3. TRẢ LẠI LOGIC CHUẨN: CHỈ HIỆN TÊN/MIC KHI CHẠM ĐÚNG VÀO Ô ĐÓ
+   4. LOGIC HIỆN TÊN/MIC (CHỈ HIỆN KHI CHẠM ĐÚNG Ô ĐÓ)
    ===================================================================== */
 /* Mặc định: Ẩn tuyệt đối tên và mic của các ô webcam nhỏ */
 .lk-carousel .lk-participant-metadata {
@@ -260,9 +269,10 @@ aside.lk-carousel,
   transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s ease !important;
   left: 4px !important;
   bottom: 4px !important;
+  position: absolute !important;
 }
 
-/* CHỈ HIỆN KHI RÊ CHUỘT HOẶC CHẠM VÀO ĐÚNG Ô ĐÓ: */
+/* CHỈ HIỆN KHI CHẠM HOẶC RÊ CHUỘT VÀO ĐÚNG Ô ĐÓ: */
 .lk-carousel .lk-participant-tile:hover .lk-participant-metadata,
 .lk-carousel .lk-participant-tile:active .lk-participant-metadata,
 .lk-carousel .lk-participant-tile:focus-within .lk-participant-metadata {
@@ -272,14 +282,13 @@ aside.lk-carousel,
   transform: translateY(0) !important;
 }
 
-/* Chặn không cho lệnh chạm màn hình phim (controls-visible) làm hiện tên webcam */
+/* Ngăn cản sự kiện chạm màn hình phim (controls-visible) làm hiện tên webcam */
 .lk-room-container.controls-visible .lk-carousel .lk-participant-metadata {
   opacity: 0 !important;
   visibility: hidden !important;
   pointer-events: none !important;
 }
 
-/* Ngoại lệ: Nếu người dùng đang chạm/hover trực tiếp vào ô webcam thì vẫn hiện */
 .lk-room-container.controls-visible .lk-carousel .lk-participant-tile:hover .lk-participant-metadata,
 .lk-room-container.controls-visible .lk-carousel .lk-participant-tile:active .lk-participant-metadata {
   opacity: 1 !important;
@@ -287,81 +296,48 @@ aside.lk-carousel,
   pointer-events: auto !important;
 }
 
-/* Căn nhãn tên siêu nhỏ gọn gàng trong góc ô webcam */
-.lk-carousel .lk-participant-metadata-item {
-  font-size: 10px !important;
-  padding: 2px 6px !important;
-  border-radius: 4px !important;
-}
-
-/* Ẩn camera thành viên khi bật nút con mắt */
-.lk-room-container.hide-tiles .lk-carousel,
-.hide-tiles .lk-carousel {
-  display: none !important;
-}
-
-/* Ẩn triệt để nút ghim/focus thừa của LiveKit trên mọi ô video */
-.lk-participant-tile button,
-.lk-focus-toggle-button,
-.lk-focus-toggle,
-[class*="focus-toggle"] {
-  display: none !important;
-}
-
-/* =====================================================================
-   4. BẢNG TÊN NGƯỜI CHIA SẺ & THÀNH VIÊN (AUTO-HIDE THEO 3 GIÂY)
-   ===================================================================== */
-.lk-participant-metadata {
-  position: absolute !important;
-  left: 14px !important;
-  bottom: 14px !important;
-  right: auto !important;
-  width: auto !important;
-  background: transparent !important;
-  border: none !important;
-  padding: 0 !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  gap: 6px !important;
-  z-index: 10 !important;
-  transition: opacity 0.35s ease, transform 0.35s ease !important;
-}
-
-/* Định dạng thẻ tên kính mờ */
+/* Định dạng thẻ tên nhỏ gọn */
 .lk-participant-metadata-item {
   background: rgba(15, 23, 42, 0.85) !important;
   backdrop-filter: blur(12px) !important;
   -webkit-backdrop-filter: blur(12px) !important;
   border: 1px solid rgba(255, 255, 255, 0.15) !important;
-  border-radius: 8px !important;
-  padding: 5px 10px !important;
+  border-radius: 6px !important;
+  padding: 2px 6px !important;
   color: #f8fafc !important;
-  font-size: 12px !important;
+  font-size: 10px !important;
   font-weight: 500 !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5) !important;
 }
 
-/* Tự động ẩn bảng tên khi không chạm vào màn hình (sau 3 giây) */
-.lk-room-container.controls-hidden .lk-participant-metadata {
+/* Bảng tên phim ("Khoa Diệp's screen") tự ẩn sau 3 giây */
+.lk-focus-layout .lk-participant-metadata {
+  position: absolute !important;
+  left: 14px !important;
+  bottom: 14px !important;
+  transition: opacity 0.35s ease, transform 0.35s ease !important;
+}
+
+.lk-room-container.controls-hidden .lk-focus-layout .lk-participant-metadata {
   opacity: 0 !important;
-  pointer-events: none !important;
+  visibility: hidden !important;
   transform: translateY(6px) !important;
+  pointer-events: none !important;
 }
 
-.lk-room-container.controls-visible .lk-participant-metadata {
+.lk-room-container.controls-visible .lk-focus-layout .lk-participant-metadata {
   opacity: 1 !important;
-  pointer-events: auto !important;
+  visibility: visible !important;
   transform: translateY(0) !important;
+  pointer-events: auto !important;
 }
 
-/* Ẩn các cột sóng/icon rác */
 .lk-participant-metadata-item:not(:first-child),
 .lk-connection-quality {
   display: none !important;
 }
 
 /* =====================================================================
-   5. THANH TIỆN ÍCH TRÊN ĐỈNH (NÚT MẮT + NÚT TOÀN MÀN HÌNH AUTO-HIDE)
+   5. THANH TIỆN ÍCH TRÊN ĐỈNH (AUTO-HIDE THEO 3 GIÂY)
    ===================================================================== */
 .video-top-overlay-bar {
   position: absolute;
@@ -389,20 +365,12 @@ aside.lk-carousel,
 }
 
 /* =====================================================================
-   6. HỆ THỐNG NÚT BẤM ĐỒNG BỘ (.custom-btn & .custom-control-bar)
+   6. THANH ĐIỀU KHIỂN & HỆ THỐNG NÚT BẤM (.custom-btn)
    ===================================================================== */
-/* Ẩn thanh bar cũ của LiveKit */
 .lk-control-bar {
-  position: fixed !important;
-  top: -9999px !important;
-  left: -9999px !important;
-  width: 1px !important;
-  height: 1px !important;
-  opacity: 0 !important;
-  overflow: hidden !important;
+  display: none !important;
 }
 
-/* Thanh điều khiển nổi đáy, căn giữa chuẩn xác */
 .custom-control-bar {
   position: fixed !important;
   bottom: calc(16px + env(safe-area-inset-bottom, 0px)) !important;
@@ -426,7 +394,6 @@ aside.lk-carousel,
   z-index: 100 !important;
 }
 
-/* Nút bấm tròn 44x44 chuẩn Apple/Vercel */
 .custom-btn {
   width: 44px !important;
   height: 44px !important;
@@ -452,14 +419,12 @@ aside.lk-carousel,
   margin: auto !important;
 }
 
-/* Trạng thái bình thường (Slate Glass) */
 .custom-btn.neutral {
   background: rgba(30, 41, 59, 0.7) !important;
   border-color: rgba(255, 255, 255, 0.15) !important;
   color: #cbd5e1 !important;
 }
 
-/* Trạng thái kích hoạt (Active Indigo) */
 .custom-btn.active {
   background: rgba(99, 102, 241, 0.25) !important;
   border-color: rgba(99, 102, 241, 0.6) !important;
@@ -467,21 +432,18 @@ aside.lk-carousel,
   color: #a5b4fc !important;
 }
 
-/* Trạng thái tắt/tắt mic/tắt mắt (Muted Hồng Đỏ) */
 .custom-btn.muted {
   background: rgba(244, 63, 94, 0.15) !important;
   border-color: rgba(244, 63, 94, 0.4) !important;
   color: #fb7185 !important;
 }
 
-/* Trạng thái chia sẻ màn hình (Green) */
 .custom-btn.sharing {
   background: rgba(16, 185, 129, 0.25) !important;
   border-color: rgba(16, 185, 129, 0.6) !important;
   color: #34d399 !important;
 }
 
-/* Trạng thái nguy hiểm / rời phòng (Red Danger) */
 .custom-btn.danger {
   background: rgba(225, 29, 72, 0.2) !important;
   border-color: rgba(225, 29, 72, 0.4) !important;
@@ -493,262 +455,18 @@ aside.lk-carousel,
 }
 
 /* =====================================================================
-   7. KHUNG CHAT KÍNH MỜ CAO CẤP
+   7. KHUNG CHAT CUSTOM (.custom-chat-panel)
    ===================================================================== */
 .lk-chat {
-  position: absolute !important;
-  top: 12px !important;
-  right: 12px !important;
-  bottom: 84px !important;
-  width: 320px !important;
-  max-width: calc(100% - 24px) !important;
-  height: auto !important;
-  background: rgba(15, 23, 42, 0.95) !important;
-  backdrop-filter: blur(24px) saturate(180%) !important;
-  -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
-  border: 1px solid rgba(255, 255, 255, 0.12) !important;
-  border-radius: 18px !important;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.85) !important;
-  z-index: 90 !important;
-}
-
-.lk-chat-header {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
-  padding: 12px 16px !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: space-between !important;
-  color: #f8fafc !important;
-  font-weight: 600 !important;
-  font-size: 14px !important;
-}
-
-.lk-chat-header button,
-.lk-chat-header .lk-button,
-.lk-chat-header .lk-close-button {
-  width: 30px !important;
-  height: 30px !important;
-  min-width: 30px !important;
-  border-radius: 50% !important;
-  background: rgba(255, 255, 255, 0.08) !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
-  color: #94a3b8 !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  padding: 0 !important;
-  cursor: pointer !important;
-  transition: all 0.2s ease !important;
-}
-
-.lk-chat-header button:hover {
-  background: rgba(239, 68, 68, 0.2) !important;
-  border-color: rgba(239, 68, 68, 0.4) !important;
-  color: #f87171 !important;
-  transform: scale(1.08) !important;
-}
-
-.lk-chat-messages {
-  padding: 14px !important;
-  gap: 10px !important;
-}
-
-.lk-chat-entry[data-lk-message-origin='local'] .lk-message-body {
-  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%) !important;
-  color: #ffffff !important;
-  border-radius: 14px 14px 2px 14px !important;
-  padding: 8px 12px !important;
-  font-size: 13px !important;
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25) !important;
-}
-
-.lk-chat-entry[data-lk-message-origin='remote'] .lk-message-body {
-  background: rgba(30, 41, 59, 0.8) !important;
-  color: #f8fafc !important;
-  border: 1px solid rgba(255, 255, 255, 0.08) !important;
-  border-radius: 14px 14px 14px 2px !important;
-  padding: 8px 12px !important;
-  font-size: 13px !important;
-}
-
-.lk-chat-entry .lk-meta-data {
-  font-size: 11px !important;
-  color: #94a3b8 !important;
-  margin-bottom: 4px !important;
-}
-
-.lk-chat-form {
-  border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
-  padding: 12px !important;
-  background: rgba(15, 23, 42, 0.6) !important;
-  display: flex !important;
-  gap: 8px !important;
-}
-
-.lk-chat-form-input,
-.lk-chat-form input {
-  flex: 1 !important;
-  background: rgba(30, 41, 59, 0.7) !important;
-  border: 1px solid rgba(255, 255, 255, 0.12) !important;
-  border-radius: 10px !important;
-  padding: 8px 12px !important;
-  font-size: 13px !important;
-  color: #ffffff !important;
-  outline: none !important;
-}
-
-.lk-chat-form-input:focus,
-.lk-chat-form input:focus {
-  border-color: #6366f1 !important;
-  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.3) !important;
-}
-
-.lk-chat-form button,
-.lk-chat-form .lk-chat-send-button {
-  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%) !important;
-  border: none !important;
-  border-radius: 10px !important;
-  color: #ffffff !important;
-  font-size: 13px !important;
-  font-weight: 600 !important;
-  padding: 0 16px !important;
-  height: 38px !important;
-  cursor: pointer !important;
-  transition: all 0.2s ease !important;
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.35) !important;
-}
-
-.lk-chat-form button:hover {
-  transform: translateY(-1px) !important;
-  box-shadow: 0 6px 18px rgba(99, 102, 241, 0.5) !important;
-}
-
-/* =====================================================================
-   8. CHẾ ĐỘ RẠP PHIM TOÀN MÀN HÌNH (:fullscreen CĂNG TRÀN VIỀN 100%)
-   ===================================================================== */
-:fullscreen,
-:-webkit-full-screen {
-  background-color: #000000 !important;
-  padding: 0 !important;
-  margin: 0 !important;
-}
-
-/* Ẩn các thành phần thừa khi đang chiếu rạp phim */
-:fullscreen .lk-carousel,
-:fullscreen .custom-control-bar,
-:-webkit-full-screen .lk-carousel,
-:-webkit-full-screen .custom-control-bar {
   display: none !important;
+  /* Ẩn triệt để khung chat cũ LiveKit */
 }
 
-/* Xóa bỏ hoàn toàn hộp bo góc & viền đệm trong chế độ toàn màn hình */
-:fullscreen .lk-video-conference,
-:fullscreen .lk-focus-layout,
-:fullscreen .lk-focus-layout .lk-participant-tile,
-:-webkit-full-screen .lk-video-conference,
-:-webkit-full-screen .lk-focus-layout,
-:-webkit-full-screen .lk-focus-layout .lk-participant-tile {
-  width: 100vw !important;
-  height: 100vh !important;
-  max-width: 100vw !important;
-  max-height: 100vh !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  border: none !important;
-  border-radius: 0 !important;
-  background: #000000 !important;
-  box-shadow: none !important;
-}
-
-/* Video phim căng 100% màn hình ngang, không hiển thị thanh đếm thời gian */
-:fullscreen .lk-focus-layout video,
-:-webkit-full-screen .lk-focus-layout video {
-  width: 100vw !important;
-  height: 100vh !important;
-  object-fit: contain !important;
-  background-color: #000000 !important;
-  border-radius: 0 !important;
-}
-
-/* ── TỰ ĐỘNG THU GỌN KHI XOAY NGANG IPAD / MÀN HÌNH CHIỀU CAO THẤP ── */
-@media (max-height: 720px) {
-  .lk-chat {
-    bottom: 74px !important;
-  }
-
-  .custom-control-bar {
-    bottom: 8px !important;
-  }
-}
-
-/* =====================================================================
-   CĂN CHỈNH CAMERA THÀNH VIÊN: TÁCH RỜI SẮC NÉT, KHÔNG VẾT MỜ
-   ===================================================================== */
-
-/* 1. Xóa sạch khung nền và vệt đen của dải chứa ngoài */
-.lk-carousel,
-.lk-focus-layout .lk-carousel {
-  position: absolute !important;
-  top: 68px !important;
-  left: 16px !important;
-  z-index: 30 !important;
-  display: flex !important;
-  flex-direction: column !important;
-  gap: 10px !important;
-  /* Khoảng cách giữa các ô */
-  width: auto !important;
-  height: auto !important;
-  padding: 0 !important;
-  margin: 0 !important;
-  background: transparent !important;
-  /* XÓA NỀN ĐEN DẢI DỌC */
-  box-shadow: none !important;
-  /* XÓA ĐỔ BÓNG NỀN */
-  border: none !important;
-  backdrop-filter: none !important;
-  /* XÓA MỜ VÙNG ĐỆM */
-  -webkit-backdrop-filter: none !important;
-}
-
-/* Xóa bỏ hiệu ứng gradient che mờ mép của LiveKit (nếu có) */
-.lk-carousel::before,
-.lk-carousel::after {
-  display: none !important;
-}
-
-/* 2. Từng ô webcam: Bo góc kính mờ sắc nét, đổ bóng gọn gàng */
-.lk-focus-layout .lk-carousel .lk-participant-tile {
-  width: 110px !important;
-  /* Kích thước gọn gàng hơn trên mobile */
-  height: 68px !important;
-  border-radius: 12px !important;
-  overflow: hidden !important;
-  background: rgba(15, 23, 42, 0.8) !important;
-  /* Nền xanh đen kính mờ */
-  backdrop-filter: blur(10px) !important;
-  -webkit-backdrop-filter: blur(10px) !important;
-  border: 1px solid rgba(255, 255, 255, 0.12) !important;
-  /* Viền kính tinh tế */
-  /* Đổ bóng gọn nhẹ, sắc nét (không bị nhòe đen thui ra ngoài) */
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
-}
-
-/* ========================================================
-   1. ẨN VĨNH VIỄN KHUNG CHAT CŨ CỦA LIVEKIT
-======================================================== */
-.lk-chat {
-  display: none !important;
-}
-
-/* ========================================================
-   2. KHUNG CHAT CUSTOM (.custom-chat-panel)
-======================================================== */
 .custom-chat-panel {
   position: absolute !important;
   top: 14px !important;
   right: 14px !important;
   bottom: 84px !important;
-  /* Dừng phía trên thanh công cụ đáy */
   width: 320px !important;
   max-width: calc(100% - 28px) !important;
   background: rgba(15, 23, 42, 0.95) !important;
@@ -758,13 +476,19 @@ aside.lk-carousel,
   border-radius: 18px !important;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.85) !important;
   z-index: 150 !important;
-  /* Nổi bật lên trên mọi thành phần */
   display: flex !important;
   flex-direction: column !important;
   overflow: hidden !important;
 }
 
-/* Header & Nút X tròn tinh tế */
+.custom-chat-panel.is-closed {
+  display: none !important;
+}
+
+.custom-chat-panel.is-open {
+  display: flex !important;
+}
+
 .custom-chat-header {
   padding: 12px 16px !important;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
@@ -803,7 +527,6 @@ aside.lk-carousel,
   transform: scale(1.08) !important;
 }
 
-/* Danh sách tin nhắn */
 .custom-chat-messages {
   flex: 1 !important;
   overflow-y: auto !important;
@@ -820,14 +543,12 @@ aside.lk-carousel,
   margin-top: 40px !important;
 }
 
-/* Từng dòng tin nhắn */
 .chat-message {
   display: flex !important;
   flex-direction: column !important;
   max-width: 82% !important;
 }
 
-/* Tin nhắn của mình (Bên phải, màu tím Indigo) */
 .chat-message.msg-me {
   align-self: flex-end !important;
   align-items: flex-end !important;
@@ -840,7 +561,6 @@ aside.lk-carousel,
   box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25) !important;
 }
 
-/* Tin nhắn của người khác (Bên trái, màu xám Slate kính mờ) */
 .chat-message.msg-other {
   align-self: flex-start !important;
   align-items: flex-start !important;
@@ -868,7 +588,6 @@ aside.lk-carousel,
   word-break: break-word !important;
 }
 
-/* Form nhập tin nhắn & nút máy bay gửi */
 .custom-chat-form {
   padding: 12px !important;
   border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
@@ -893,7 +612,6 @@ aside.lk-carousel,
   border-color: #6366f1 !important;
 }
 
-/* NÚT SEND MÁY BAY GIẤY */
 .chat-send-btn {
   background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%) !important;
   border: none !important;
@@ -921,20 +639,7 @@ aside.lk-carousel,
   transform: none !important;
 }
 
-/* ========================================================
-   1. ẨN/HIỆN KHUNG CHAT MÀ KHÔNG HỦY COMPONENT
-======================================================== */
-.custom-chat-panel.is-closed {
-  display: none !important;
-}
-
-.custom-chat-panel.is-open {
-  display: flex !important;
-}
-
-/* ========================================================
-   HUY HIỆU ĐỎ TĨNH BÁO TIN NHẮN (KHÔNG NHẤP NHÁY)
-======================================================== */
+/* Huy hiệu đỏ tĩnh báo tin nhắn chưa đọc */
 .chat-unread-badge {
   position: absolute !important;
   top: -2px !important;
@@ -944,7 +649,6 @@ aside.lk-carousel,
   padding: 0 4px !important;
   border-radius: 9999px !important;
   background: #ef4444 !important;
-  /* Màu đỏ nổi bật */
   color: #ffffff !important;
   font-size: 11px !important;
   font-weight: 700 !important;
@@ -952,7 +656,59 @@ aside.lk-carousel,
   align-items: center !important;
   justify-content: center !important;
   border: 2px solid #0f172a !important;
-  /* Viền tiệp màu với nút điều khiển */
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4) !important;
-  /* ❌ ĐÃ XÓA HOÀN TOÀN HIỆU ỨNG ANIMATION NHẤP NHÁY */
+}
+
+/* =====================================================================
+   8. CHẾ ĐỘ RẠP PHIM TOÀN MÀN HÌNH (:fullscreen CĂNG TRÀN VIỀN 100%)
+   ===================================================================== */
+:fullscreen,
+:-webkit-full-screen {
+  background-color: #000000 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+:fullscreen .lk-carousel,
+:fullscreen .custom-control-bar,
+:-webkit-full-screen .lk-carousel,
+:-webkit-full-screen .custom-control-bar {
+  display: none !important;
+}
+
+:fullscreen .lk-video-conference,
+:fullscreen .lk-focus-layout,
+:fullscreen .lk-focus-layout .lk-participant-tile,
+:-webkit-full-screen .lk-video-conference,
+:-webkit-full-screen .lk-focus-layout,
+:-webkit-full-screen .lk-focus-layout .lk-participant-tile {
+  width: 100vw !important;
+  height: 100vh !important;
+  max-width: 100vw !important;
+  max-height: 100vh !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  border-radius: 0 !important;
+  background: #000000 !important;
+  box-shadow: none !important;
+}
+
+:fullscreen .lk-focus-layout video,
+:-webkit-full-screen .lk-focus-layout video {
+  width: 100vw !important;
+  height: 100vh !important;
+  object-fit: contain !important;
+  background-color: #000000 !important;
+  border-radius: 0 !important;
+}
+
+@media (max-height: 720px) {
+  .custom-chat-panel {
+    bottom: 74px !important;
+  }
+
+  .custom-control-bar {
+    bottom: 8px !important;
+  }
 }
